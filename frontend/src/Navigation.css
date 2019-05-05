@@ -1,0 +1,17 @@
+.navigation {
+    margin: 0;
+    padding: 0;
+    width: 200px;
+    background-color: #2a2d34;
+    position: fixed;
+    height: 100%;
+    overflow: auto;
+}
+
+.navigation .nav-header {
+    height: 50px;
+    background-color: black;
+    color: white;
+    text-align: center;
+    font-size: 30px;
+}

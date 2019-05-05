@@ -1,0 +1,40 @@
+.btn, .splitBtn {
+  background-color: #2a2d34;
+  color: white;
+  font-size: 16px;
+  border: none;
+  outline: none;
+  padding: 5px;
+  border-bottom: 1px solid black;
+  cursor: pointer;
+}
+
+.btn .selected {
+    color: green;
+}
+
+.btn a {
+    text-decoration: none;
+}
+
+.btn a:visited {
+    color: white;
+}
+
+.splitContainer {
+    width: 100%;
+}
+
+.splitBtn {
+    width: 80%;
+}
+
+.dropdown {
+    width: 20%;
+    position: absolute;
+    display: inline-block;
+}
+
+.btn:hover, .dropdown:hover .btn {
+  background-color: #171717;
+}
