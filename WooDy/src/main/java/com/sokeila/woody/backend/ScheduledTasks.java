@@ -2,7 +2,9 @@ package com.sokeila.woody.backend;
 
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -124,81 +126,115 @@ public class ScheduledTasks {
 				}
 			}
 			
-			if(subCategorySet.size() == 1) {
+			if(subCategorySet.size() == 1 || (subCategorySet.size() > 1 && onlySingleSubCategory(subCategorySet))) {
 				categoryData = subCategorySet.iterator().next();
 			}
 		}
 		
 		if(categoryData == null) {
-			log.info("Could not resolve category for title {}. Categories in feed are {}", entry.getTitle(), entry.getCategories());
+			log.info("Could not resolve category for title {}. \nCategories in feed are \n{}", entry.getTitle(), collectGategories(entry.getCategories()));
 		}
 		
 		return categoryData;
 	}
 
+	private boolean onlySingleSubCategory(Set<CategoryData> subCategorySet) {
+		SubCategory subCategory = null;
+		boolean first = true;
+		for(CategoryData cd: subCategorySet) {
+			if(first == true) {
+				subCategory = cd.getSubCategory();
+				first = false;
+			} else {
+				if(cd.getSubCategory() != subCategory) {
+					return false;
+				}
+			}
+			
+		}
+		return true;
+	}
+
+	private Collection<String> collectGategories(List<SyndCategory> categories) {
+		Collection<String> result = new ArrayList<>();
+		for(SyndCategory sc: categories) {
+			result.add(sc.getName() + "\n");
+		}
+		return result;
+	}
+
 	private CategoryData resolveCategoryData(SyndCategory syndCategory) {
 		String categoryName = syndCategory.getName();
 		//Resolve NEWS sub categories
-		if(categoryBelongs(categoryName, Arrays.asList("Kotimaa", "Kotimaan uutiset"))) {
+		if(categoryBelongs(categoryName, null, new Compare("Kotimaa", "Kotimaan uutiset", "PÃ¤ijÃ¤t-HÃ¤me", "Turun seutu"))) {
 			return new CategoryData(Category.NEWS, SubCategory.HOMELAND);
-		} else if(categoryBelongs(categoryName, Arrays.asList("Ulkomaa", "Ulkomaat"))) {
+		} else if(categoryBelongs(categoryName, null, new Compare("Ulkomaa", "Ulkomaat"))) {
 			return new CategoryData(Category.NEWS, SubCategory.ABROAD);
-		} else if(categoryBelongs(categoryName, Arrays.asList("Tiede"))) {
+		} else if(categoryBelongs(categoryName, null, new Compare("Tiede"))) {
 			return new CategoryData(Category.NEWS, SubCategory.SCIENCE);
-		} else if(categoryBelongs(categoryName, Arrays.asList("Talous", "Taloussanomat", "Pörssiuutiset"))) {
+		} else if(categoryBelongs(categoryName, null, new Compare("Talous", "Taloussanomat", "PÃ¶rssiuutiset", "Sijoittaminen", "Kauppa"))) {
 			return new CategoryData(Category.NEWS, SubCategory.ECONOMY);
-		} else if(categoryBelongs(categoryName, Arrays.asList("Politiikka"))) {
+		} else if(categoryBelongs(categoryName, null, new Compare("Politiikka"))) {
 			return new CategoryData(Category.NEWS, SubCategory.POLITICS);
 		}
 		
 		//Resolve ENTERTAINMENT sub categories
-		else if(categoryBelongs(categoryName, Arrays.asList("Viihde"))) {
+		else if(categoryBelongs(categoryName, null, new Compare("Viihde"))) {
 			return new CategoryData(Category.ENTERTAINMENT, null);
 		}
 		
 		//Resolve SPORTS sub categories
-		else if(categoryBelongs(categoryName, Arrays.asList("Jääkiekko", "jaakiekko", "NHL", "Liiga", "SM-liiga", "smliiga", "Kiekko", "MM-kiekko", "KHL"))) {
+		else if(categoryBelongs(categoryName, new Compare("kiekko"), new Compare("NHL", "Liiga", "SM-liiga", "smliiga", "KHL"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.ICE_HOCKEY);
-		} else if(categoryBelongs(categoryName, Arrays.asList("Jalkapallo", "Veikkausliiga", "Mestarien liiga", "mestarienliiga", "Eurosarjat", "valioliiga"))) {
+		} else if(categoryBelongs(categoryName, null, new Compare("Jalkapallo", "Veikkausliiga", "Mestarien liiga", "mestarienliiga", "Eurosarjat", "valioliiga"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.FOOTBALL);
-		} else if(categoryBelongs(categoryName, Arrays.asList("Yleisurheilu"))) {
+		} else if(categoryBelongs(categoryName, null, new Compare("Yleisurheilu"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.ATHLEITCS);
-		} else if(categoryBelongs(categoryName, Arrays.asList("Formula 1", "formulat"))) {
+		} else if(categoryBelongs(categoryName, null, new Compare("Formula 1", "formulat"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.FORMULA1);
-		} else if(categoryBelongs(categoryName, Arrays.asList("Ralli"))) {
+		} else if(categoryBelongs(categoryName, null, new Compare("Ralli"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.RALLY);
-		} else if(categoryBelongs(categoryName, Arrays.asList("Salibandy"))) {
+		} else if(categoryBelongs(categoryName, null, new Compare("Salibandy"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.FLOORBALL);
-		} else if(categoryBelongs(categoryName, Arrays.asList("Koripallo", "NBA"))) {
+		} else if(categoryBelongs(categoryName, null, new Compare("Koripallo", "NBA"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.BASKETBALL);
-		} else if(categoryBelongs(categoryName, Arrays.asList("Ravivihjeet", "vedonlyontiravit", "Ravivihjeet Ruotsi", "Ravit"))) {
+		} else if(categoryBelongs(categoryName, new Compare("ravi", "Ravi"), new Compare("ravi"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.HARNESS_RACING);
-		} else if(categoryBelongs(categoryName, Arrays.asList("Nyrkkeily", "kamppailulajit"))) {
+		} else if(categoryBelongs(categoryName, null, new Compare("Nyrkkeily", "kamppailulajit"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.MARTIAL_ARTS);
-		} else if(categoryBelongs(categoryName, Arrays.asList("talviurheilu"))) {
+		} else if(categoryBelongs(categoryName, null, new Compare("talviurheilu"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.WINTER_SPORTS);
-		} else if(categoryBelongs(categoryName, Arrays.asList("Esports"))) {
+		} else if(categoryBelongs(categoryName, null, new Compare("Esports"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.E_SPORTS);
-		} else if(categoryBelongs(categoryName, Arrays.asList("Golf"))) {
+		} else if(categoryBelongs(categoryName, null, new Compare("Golf"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.GOLF);
-		} else if(categoryBelongs(categoryName, Arrays.asList("Moottoripyöräily"))) {
+		} else if(categoryBelongs(categoryName, null, new Compare("MoottoripyÃ¶rÃ¤ily"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.MOTORBIKES);
-		} else if(categoryBelongs(categoryName, Arrays.asList("muutlajit", "fitnessvoimailu"))) {
+		} else if(categoryBelongs(categoryName, null, new Compare("muutlajit", "fitnessvoimailu", "Muut lajit"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.OTHER_SPORTS);
 		}
 		
 		//Resolve IT sub categories
-		else if(categoryBelongs(categoryName, Arrays.asList("Tietotekniikka", "Mobiili"))) {
+		else if(categoryBelongs(categoryName, null, new Compare("Tietotekniikka", "Mobiili", "Pelit", "Digitalous"))) {
 			return new CategoryData(Category.IT, null);
 		}
 		
 		return null;
 	}
 
-	private boolean categoryBelongs(String categoryName, List<String> categoryNames) {
-		for(String category: categoryNames) {
-			if(categoryName.equalsIgnoreCase(category))
-				return true;
+	private boolean categoryBelongs(String categoryName, Compare compareContains, Compare compareEquals) {
+		if(compareContains != null) {
+			for(String category: compareContains.getCategoryNames()) {
+				if(categoryName.contains(category))
+					return true;
+			}
+		}
+		
+		if(compareEquals != null) {
+			for(String category: compareEquals.getCategoryNames()) {
+				if(categoryName.equalsIgnoreCase(category))
+					return true;
+			}
 		}
 		return false;
 	}
@@ -225,6 +261,17 @@ public class ScheduledTasks {
 		}
 		public SubCategory getSubCategory() {
 			return subCategory;
+		}
+	}
+	
+	private static class Compare {
+		private Collection<String> categoryNames;
+		
+		public Compare(String... values) {
+			categoryNames = Arrays.asList(values);
+		}
+		public Collection<String> getCategoryNames() {
+			return categoryNames;
 		}
 	}
 }

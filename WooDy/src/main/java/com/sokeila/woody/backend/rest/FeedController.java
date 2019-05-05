@@ -24,11 +24,12 @@ public class FeedController {
 	
 	@GetMapping(path = "/rest/news")
 	public Page<Feed> news(@RequestParam(name = "page", required = false) Integer page) {
-		log.info("Load news in page {}", page);
-		
 		if(page == null) {
 			page = 0;
 		}
+		
+		log.info("Load news in page {}", page);
+		
 		Pageable pageable = PageRequest.of(page, 50);
 		Page<Feed> result = feedRepository.findByOrderByPublishedDesc(pageable);
 		return result;

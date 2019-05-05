@@ -1,0 +1,43 @@
+.feedItem {
+	border-bottom: 1px solid gray;
+	display: table;
+	width: 100%;
+}
+
+.feedItem .cell {
+	padding-top: 5px;
+	padding-bottom: 8px;
+	display: table-cell;
+}
+
+.feedItem .text {
+	padding-left: 20px;
+	padding-right: 10px;
+	width: 85%;
+}
+
+.feedItem .text p {
+	font-size: 13px;
+	margin: 0px;
+	color: rgba(0,0,0,0.55);
+	word-break: break-word;
+}
+
+.feedItem .source {
+	max-width: 90px;
+	font-size: 10px;
+}
+
+.feedItem a {
+	font-size: 15px;
+	word-break: break-word;
+	color: #1d1f24;
+	text-decoration: none;
+}
+
+.feedItem a:visited {
+	color: #747882;
+}
+
+.feedItem:nth-child(even) {background: #f9f9f9;}
+.feedItem:nth-child(odd) {background: #ffffff}

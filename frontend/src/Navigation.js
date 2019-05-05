@@ -7,13 +7,13 @@ class Navigation extends React.Component {
   render() {
     return (
         <div className="navigation">
-            <div className="nav-header">Woody</div>
+            <div className="nav-header"><p>News.io</p></div>
             <Button text="Etusivu"/>
             <Button text="Uutiset"/>
             <Button text="Urheilu"/>
             <Button text="IT"/>
             <Button text="Viihde"/>
-            <SplitButton/>
+            {/*<SplitButton/>*/}
         </div>
     );
   }

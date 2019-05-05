@@ -1,7 +1,7 @@
 .navigation {
     margin: 0;
     padding: 0;
-    width: 200px;
+    width: 180px;
     background-color: #2a2d34;
     position: fixed;
     height: 100%;
@@ -14,4 +14,9 @@
     color: white;
     text-align: center;
     font-size: 30px;
+}
+
+.navigation .nav-header p {
+    margin: 0px;
+    padding: 7px 0;
 }
