@@ -13,7 +13,7 @@
 .feedItem .text {
 	padding-left: 20px;
 	padding-right: 10px;
-	width: 85%;
+	width: 80%;
 }
 
 .feedItem .text p {
@@ -26,6 +26,14 @@
 .feedItem .source {
 	max-width: 90px;
 	font-size: 10px;
+	text-align: right;
+	width: 10%;
+}
+
+.feedItem .published {
+	max-width: 90px;
+	font-size: 10px;
+	text-align: center;
 }
 
 .feedItem a {

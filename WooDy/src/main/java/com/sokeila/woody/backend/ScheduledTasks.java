@@ -12,6 +12,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import javax.net.ssl.SSLContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +75,11 @@ public class ScheduledTasks {
 
 	private void parseRss(RssSource rssSource, Category category, Function<RssSource, String> urlFunction) {
 		String url = urlFunction.apply(rssSource);
+		
 		try {
+			SSLContext context = SSLContext.getInstance("TLSv1.2");
+			context.init(null,null,null);
+			SSLContext.setDefault(context);
 			if(url != null && url.length() > 0) {
 	            try (XmlReader reader = new XmlReader(new URL(url))) {
 	                SyndFeed feed = new SyndFeedInput().build(reader);
@@ -142,15 +148,16 @@ public class ScheduledTasks {
 		SubCategory subCategory = null;
 		boolean first = true;
 		for(CategoryData cd: subCategorySet) {
-			if(first == true) {
-				subCategory = cd.getSubCategory();
-				first = false;
-			} else {
-				if(cd.getSubCategory() != subCategory) {
-					return false;
+			if(cd.getSubCategory() != null) {
+				if(first == true) {
+					subCategory = cd.getSubCategory();
+					first = false;
+				} else {
+					if(cd.getSubCategory() != subCategory) {
+						return false;
+					}
 				}
 			}
-			
 		}
 		return true;
 	}
@@ -166,13 +173,15 @@ public class ScheduledTasks {
 	private CategoryData resolveCategoryData(SyndCategory syndCategory) {
 		String categoryName = syndCategory.getName();
 		//Resolve NEWS sub categories
-		if(categoryBelongs(categoryName, null, new Compare("Kotimaa", "Kotimaan uutiset", "Päijät-Häme", "Turun seutu"))) {
+		if(categoryBelongs(categoryName, null, new Compare("Uutiset"))) {
+			return new CategoryData(Category.NEWS, null);
+		} else if(categoryBelongs(categoryName, null, new Compare("Kotimaa", "Kotimaan uutiset", "Päijät-Häme", "Turun seutu", "Keskusta nyt", "Oulun seutu", "Tampereen seutu", "Vantaa", "Kaupunki"))) {
 			return new CategoryData(Category.NEWS, SubCategory.HOMELAND);
 		} else if(categoryBelongs(categoryName, null, new Compare("Ulkomaa", "Ulkomaat"))) {
 			return new CategoryData(Category.NEWS, SubCategory.ABROAD);
 		} else if(categoryBelongs(categoryName, null, new Compare("Tiede"))) {
 			return new CategoryData(Category.NEWS, SubCategory.SCIENCE);
-		} else if(categoryBelongs(categoryName, null, new Compare("Talous", "Taloussanomat", "Pörssiuutiset", "Sijoittaminen", "Kauppa"))) {
+		} else if(categoryBelongs(categoryName, null, new Compare("Talous", "Taloussanomat", "Pörssiuutiset", "Sijoittaminen", "Kauppa", "Kansantalous", "Yrittäminen"))) {
 			return new CategoryData(Category.NEWS, SubCategory.ECONOMY);
 		} else if(categoryBelongs(categoryName, null, new Compare("Politiikka"))) {
 			return new CategoryData(Category.NEWS, SubCategory.POLITICS);
@@ -181,10 +190,16 @@ public class ScheduledTasks {
 		//Resolve ENTERTAINMENT sub categories
 		else if(categoryBelongs(categoryName, null, new Compare("Viihde"))) {
 			return new CategoryData(Category.ENTERTAINMENT, null);
+		} else if(categoryBelongs(categoryName, null, new Compare("Musiikki"))) {
+			return new CategoryData(Category.ENTERTAINMENT, SubCategory.MUSIC);
+		} else if(categoryBelongs(categoryName, null, new Compare("Elokuvat"))) {
+			return new CategoryData(Category.ENTERTAINMENT, SubCategory.MOVIES);
 		}
 		
 		//Resolve SPORTS sub categories
-		else if(categoryBelongs(categoryName, new Compare("kiekko"), new Compare("NHL", "Liiga", "SM-liiga", "smliiga", "KHL"))) {
+		else if(categoryBelongs(categoryName, null, new Compare("Urheilu"))) {
+			return new CategoryData(Category.SPORTS, null);
+		} else if(categoryBelongs(categoryName, new Compare("kiekko"), new Compare("NHL", "Liiga", "SM-liiga", "smliiga", "KHL"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.ICE_HOCKEY);
 		} else if(categoryBelongs(categoryName, null, new Compare("Jalkapallo", "Veikkausliiga", "Mestarien liiga", "mestarienliiga", "Eurosarjat", "valioliiga"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.FOOTBALL);
@@ -196,7 +211,7 @@ public class ScheduledTasks {
 			return new CategoryData(Category.SPORTS, SubCategory.RALLY);
 		} else if(categoryBelongs(categoryName, null, new Compare("Salibandy"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.FLOORBALL);
-		} else if(categoryBelongs(categoryName, null, new Compare("Koripallo", "NBA"))) {
+		} else if(categoryBelongs(categoryName, null, new Compare("Koripallo", "NBA", "Korisliiga"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.BASKETBALL);
 		} else if(categoryBelongs(categoryName, new Compare("ravi", "Ravi"), new Compare("ravi"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.HARNESS_RACING);
@@ -208,6 +223,10 @@ public class ScheduledTasks {
 			return new CategoryData(Category.SPORTS, SubCategory.E_SPORTS);
 		} else if(categoryBelongs(categoryName, null, new Compare("Golf"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.GOLF);
+		} else if(categoryBelongs(categoryName, null, new Compare("Tennis"))) {
+			return new CategoryData(Category.SPORTS, SubCategory.TENNIS);
+		} else if(categoryBelongs(categoryName, null, new Compare("Lentopallo"))) {
+			return new CategoryData(Category.SPORTS, SubCategory.VOLLEY_BALL);
 		} else if(categoryBelongs(categoryName, null, new Compare("Moottoripyöräily"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.MOTORBIKES);
 		} else if(categoryBelongs(categoryName, null, new Compare("muutlajit", "fitnessvoimailu", "Muut lajit"))) {
@@ -215,7 +234,7 @@ public class ScheduledTasks {
 		}
 		
 		//Resolve IT sub categories
-		else if(categoryBelongs(categoryName, null, new Compare("Tietotekniikka", "Mobiili", "Pelit", "Digitalous"))) {
+		else if(categoryBelongs(categoryName, null, new Compare("Tietotekniikka", "Mobiili", "Pelit", "Digitalous", "Android", "Teknologia"))) {
 			return new CategoryData(Category.IT, null);
 		}
 		

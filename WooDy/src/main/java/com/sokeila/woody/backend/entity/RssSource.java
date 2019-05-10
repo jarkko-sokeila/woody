@@ -8,8 +8,15 @@ public enum RssSource {
 	KAUPPALEHTI("https://feeds.kauppalehti.fi/rss/main", null, null),
 	MUROPAKETTI(null, null, "https://muropaketti.com/feed"),
 	HS("https://www.hs.fi/rss/tuoreimmat.xml", "https://www.hs.fi/rss/urheilu.xml", null),
-	ESS("https://www.ess.fi/feed/rss/1672716", null, null);
-	//KESKISUOMALAINEN("http://www.jyvaskyla.fi/term/103/rss.xml", null, null);
+	ESS("https://www.ess.fi/feed/rss/1672716", null, null),
+	SUOMIURHEILU(null, "https://www.suomiurheilu.com/feed/", null),
+	SUOMIKIEKKO(null, "https://www.suomikiekko.com/feed/", null),
+	SUOMIF1(null, "https://www.suomif1.com/feed/", null),
+	SUOMIKORIS(null, "https://www.suomikoris.com/feed/", null),
+	SUOMIFUTIS(null, "https://www.suomifutis.com/feed/", null),
+	TEKNIIKAN_MAAILMA("https://vanha.tekniikanmaailma.fi/feed/?_ga=2.154744318.731211921.1557421888-1292752952.1527702300", null, null),
+	SUOMENMAA("https://www.suomenmaa.fi/neo/neoproxy.dll?tem=rss_neo&tem=rss_neo", null, null);
+	//KESKISUOMALAINEN("https://www.jyvaskyla.fi/term/103/rss.xml", null, null);
 	
 	
 	private String newsSource;
