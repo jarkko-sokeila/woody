@@ -29,3 +29,11 @@ dependencies {
     
     testImplementation 'junit:junit'
 }
+
+bootJar {
+    from('../frontend/build') {
+        into 'static'
+    }
+}
+
+//bootJar.dependsOn(':frontend:assemble')
