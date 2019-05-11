@@ -1,6 +1,7 @@
 import React from 'react';
 import {faArrowCircleUp} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import Switch from '@material-ui/core/Switch';
 import FeedItem from './FeedItem';
 import './Content.css';
 
@@ -13,8 +14,13 @@ class Content extends React.Component {
     this.state = {
       data: null,
       feeds: [],
+      showDescription: true,
     };
   }
+
+  handleChange = name => event => {
+    this.setState({ [name]: event.target.checked });
+  };
 
   getData() {
     fetch('/rest/test')
@@ -50,7 +56,6 @@ class Content extends React.Component {
 		      document.getElementById("topBtn").style.display = "none";
 		    }
 	    });
-	  //window.onscroll = scrollFunction();
   }
   
   scrollFunction() {
@@ -71,12 +76,16 @@ class Content extends React.Component {
     return (
         <div>
             <div className="header">
-                <span>News</span>
+                <div><span>News, {this.state.data}</span></div>
+                <div className="test">foo 
+                    <Switch checked={this.state.showDescription}
+                        onChange={this.handleChange('showDescription')}
+                        value="showDescription" />
+                </div>
             </div>
             <div className="content">
-                <h4>Hello, {this.state.data}</h4>
                 {this.state.feeds.length ?
-                    this.state.feeds.map(item=><FeedItem key={item.id} item={item}/>) 
+                    this.state.feeds.map(item=><FeedItem key={item.id} item={item} showDescription={this.state.showDescription}/>) 
                     : <span>Loading...</span>
                 }
             </div>
@@ -85,7 +94,6 @@ class Content extends React.Component {
             </div>
             
             <FontAwesomeIcon icon={faArrowCircleUp} onClick={this.topFunction} id="topBtn" />
-            
         </div>
     );
   }

@@ -14,7 +14,7 @@ public enum RssSource {
 	SUOMIF1(null, "https://www.suomif1.com/feed/", null),
 	SUOMIKORIS(null, "https://www.suomikoris.com/feed/", null),
 	SUOMIFUTIS(null, "https://www.suomifutis.com/feed/", null),
-	TEKNIIKAN_MAAILMA("https://vanha.tekniikanmaailma.fi/feed/?_ga=2.154744318.731211921.1557421888-1292752952.1527702300", null, null),
+	TEKNIIKAN_MAAILMA("https://vanha.tekniikanmaailma.fi/feed/", null, null),
 	SUOMENMAA("https://www.suomenmaa.fi/neo/neoproxy.dll?tem=rss_neo&tem=rss_neo", null, null);
 	//KESKISUOMALAINEN("https://www.jyvaskyla.fi/term/103/rss.xml", null, null);
 	
