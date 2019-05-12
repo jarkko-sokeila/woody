@@ -4,9 +4,12 @@ import './Button.css';
 class Button extends React.Component {
   render() {
     return (
-        <div className="btn" onClick={this.handleClick}>
-            <a href="#/" >{this.props.text}</a>
-        </div>
+        <a href={this.props.link} >
+            <div className="btn" onClick={this.handleClick}>
+                <span>{this.props.text}</span>
+            </div>
+        </a>
+        
     );
   }
 

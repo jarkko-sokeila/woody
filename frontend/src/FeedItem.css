@@ -43,6 +43,10 @@
 	text-decoration: none;
 }
 
+.feedItem .cell > a:hover {
+    text-decoration: underline;
+}
+
 .feedItem a:visited {
 	color: #747882;
 }

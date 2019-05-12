@@ -43,6 +43,12 @@ class FeedItem extends React.Component {
         source = "io-tech"
     } else if (source === 'SUOMENMAA') {
         source = "Suomenmaa"
+    } else if (source === 'KALEVA') {
+        source = "Kaleva"
+    } else if (source === 'POLIISI') {
+        source = "Poliisi"
+    } else if (source === 'TIVI') {
+        source = "Tivi"
     }
     
     if(subCategory != null) {

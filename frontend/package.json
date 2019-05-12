@@ -1,7 +1,7 @@
 {
-  "name": "react-hello-world",
+  "name": "woody",
   "version": "1.0.0",
-  "description": "React Hello World",
+  "description": "WooDy",
   "main": "index.js",
   "scripts": {
     "start": "react-scripts start",
@@ -21,6 +21,7 @@
     "react": "^16.2.0",
     "react-bootstrap": "^1.0.0-beta.8",
     "react-dom": "^16.2.0",
+    "react-router-dom": "^5.0.0",
     "react-scripts": "^2.1.5"
   },
   "browserslist": [

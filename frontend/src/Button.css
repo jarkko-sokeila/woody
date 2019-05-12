@@ -1,7 +1,7 @@
 .btn, .splitBtn {
   background-color: #2a2d34;
   color: white;
-  font-size: 16px;
+  font-size: 13px;
   border: none;
   outline: none;
   padding: 5px;
@@ -9,12 +9,16 @@
   cursor: pointer;
 }
 
-.btn .selected {
-    color: green;
+.btn.selected span {
+    color: green
 }
 
-.btn a {
+a {
     text-decoration: none;
+}
+
+.btn span {
+    padding-left: 10px;
 }
 
 .btn a:visited {

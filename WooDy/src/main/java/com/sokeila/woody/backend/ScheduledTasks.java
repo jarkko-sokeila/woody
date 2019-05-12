@@ -109,7 +109,7 @@ public class ScheduledTasks {
 		
 		entity.setRssSource(rssSource);
 		entity.setTitle(entry.getTitle());
-		entity.setDescription(entry.getDescription().getValue());
+		entity.setDescription(formatDescription(entry.getDescription() != null ? entry.getDescription().getValue(): null));
 		entity.setGuid(entry.getUri());
 		entity.setLink(entry.getLink());
 		entity.setPublished(entry.getPublishedDate());
@@ -117,6 +117,21 @@ public class ScheduledTasks {
 		entity.setSubCategory(categoryData != null ? categoryData.getSubCategory() : null);
 		
 		feedRepository.save(entity);
+	}
+
+	private String formatDescription(String description) {
+		if(description == null)
+			return null;
+		
+		String strRegEx = "<[^>]*>";
+		description = description.replaceAll(strRegEx, "");
+		
+		description = description.replace("&#8221;", "\"");
+		description = description.replace("&#8211;", "-");
+		description = description.replace("&#8230;", "...");
+		
+		
+		return description;
 	}
 
 	private CategoryData resolveCategoryData(SyndEntry entry) {
@@ -181,7 +196,7 @@ public class ScheduledTasks {
 			return new CategoryData(Category.NEWS, SubCategory.ABROAD);
 		} else if(categoryBelongs(categoryName, null, new Compare("Tiede"))) {
 			return new CategoryData(Category.NEWS, SubCategory.SCIENCE);
-		} else if(categoryBelongs(categoryName, null, new Compare("Talous", "Taloussanomat", "Pörssiuutiset", "Sijoittaminen", "Kauppa", "Kansantalous", "Yrittäminen"))) {
+		} else if(categoryBelongs(categoryName, null, new Compare("Talous", "Taloussanomat", "Pörssiuutiset", "Sijoittaminen", "Kauppa", "Kansantalous", "Yrittäminen", "tyoelama"))) {
 			return new CategoryData(Category.NEWS, SubCategory.ECONOMY);
 		} else if(categoryBelongs(categoryName, null, new Compare("Politiikka"))) {
 			return new CategoryData(Category.NEWS, SubCategory.POLITICS);
@@ -229,6 +244,8 @@ public class ScheduledTasks {
 			return new CategoryData(Category.SPORTS, SubCategory.VOLLEY_BALL);
 		} else if(categoryBelongs(categoryName, null, new Compare("Moottoripyöräily"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.MOTORBIKES);
+		} else if(categoryBelongs(categoryName, null, new Compare("Pesäpallo"))) {
+			return new CategoryData(Category.SPORTS, SubCategory.BASEBALL);
 		} else if(categoryBelongs(categoryName, null, new Compare("muutlajit", "fitnessvoimailu", "Muut lajit"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.OTHER_SPORTS);
 		}

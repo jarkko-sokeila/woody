@@ -1,13 +1,14 @@
 .content {
     margin-left: 180px; /* Same as the width of the sidenav */
     font-size: 20px; /* Increased text to enable scrolling */
-    padding-top: 50px;
+    /*padding-top: 50px;*/
+    min-height: calc(100vh - 93px);
 }
 
 .header {
     margin-left: 180px; /* Same as the width of the sidenav */
     height: 50px;
-    background-color: beige;
+    background-color: #eeeeee;
     color: black;
     font-size: 30px;
     padding-left: 20px;
@@ -18,9 +19,14 @@
     flex: 1;
 }
 
+.header .header-title {
+    padding-top: 3px;
+}
+
 .header > .test {
     text-align: right;
     padding-right: 50px;
+    flex: 0 0 200px
 }
 
 .footer {

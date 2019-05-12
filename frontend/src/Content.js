@@ -16,6 +16,9 @@ class Content extends React.Component {
       feeds: [],
       showDescription: true,
     };
+
+    this.getFeeds = this.getFeeds.bind(this);
+    this.getFeeds = this.getFeeds.bind(this);
   }
 
   handleChange = name => event => {
@@ -24,13 +27,21 @@ class Content extends React.Component {
 
   getData() {
     fetch('/rest/test')
-      .then(response => response.text())
-      .then(data => this.setState({ data }));
+        .then(response => response.text())
+        .then(data => this.setState({ data }));
   }
 
   getFeeds() {
+      var category = this.props.category;
+      var url;
       var content = this;
-    fetch('/rest/news')
+    if(category === null || category === "") {
+        url = "/rest/news";
+    } else {
+        url = "/rest/news?category=" + category;
+    }
+    console.log("Read news from url " + url)
+    fetch(url)
         .then(function(response) {
             console.log(response);
             return response.json();
@@ -39,6 +50,20 @@ class Content extends React.Component {
             console.log(feeds.content);
             content.setState({ feeds: feeds.content });
         });
+  }
+
+  getHeaderTitle() {
+    var category = this.props.category
+    if(category === 'NEWS')
+        return "Uutiset";
+    else if(category === 'SPORTS')
+        return "Urheilu";
+    else if(category === 'IT')
+        return "IT";
+    else if(category === 'ENTERTAINMENT')
+        return "Viihde";
+
+    return "Etusivu"
   }
 
   componentDidMount(){
@@ -76,8 +101,8 @@ class Content extends React.Component {
     return (
         <div>
             <div className="header">
-                <div><span>News, {this.state.data}</span></div>
-                <div className="test">foo 
+                <div className="header-title"><span>{this.getHeaderTitle()}</span></div> {/* News, {this.state.data}*/}
+                <div className="test">Esikatselu
                     <Switch checked={this.state.showDescription}
                         onChange={this.handleChange('showDescription')}
                         value="showDescription" />
@@ -89,9 +114,9 @@ class Content extends React.Component {
                     : <span>Loading...</span>
                 }
             </div>
-            <div className="footer">
-            	<div className="center"><p>Copyright 2019 news.io</p></div>
-            </div>
+            <footer className="footer">
+            	<div className="center"><p>Copyright 2019 WooDy</p></div>
+            </footer>
             
             <FontAwesomeIcon icon={faArrowCircleUp} onClick={this.topFunction} id="topBtn" />
         </div>
