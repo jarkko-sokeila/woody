@@ -10,7 +10,8 @@
 }
 
 .btn.selected span {
-    color: green
+    color: green;
+    background-color: #171717;
 }
 
 a {

@@ -1,6 +1,8 @@
 import React from 'react';
 import {faArrowCircleUp} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Cookies from 'universal-cookie';
 import Switch from '@material-ui/core/Switch';
 import FeedItem from './FeedItem';
 import './Content.css';
@@ -10,19 +12,19 @@ import './Content.css';
 class Content extends React.Component {
     constructor(props) {
     super(props);
-
+    this.cookies = new Cookies();
     this.state = {
       data: null,
       feeds: [],
-      showDescription: true,
     };
 
-    this.getFeeds = this.getFeeds.bind(this);
+    console.log("cookie showDescription " + this.cookies.get('showDescription'))
     this.getFeeds = this.getFeeds.bind(this);
   }
 
   handleChange = name => event => {
-    this.setState({ [name]: event.target.checked });
+    this.cookies.set('showDescription', event.target.checked);
+    console.log("cookie showDescription " + this.cookies.get('showDescription'))
   };
 
   getData() {
@@ -102,15 +104,20 @@ class Content extends React.Component {
         <div>
             <div className="header">
                 <div className="header-title"><span>{this.getHeaderTitle()}</span></div> {/* News, {this.state.data}*/}
-                <div className="test">Esikatselu
-                    <Switch checked={this.state.showDescription}
-                        onChange={this.handleChange('showDescription')}
-                        value="showDescription" />
+                <div className="test">
+                	<FormControlLabel
+		                control={
+		                    <Switch checked={this.cookies.get('showDescription') === "true" }
+		                        onChange={this.handleChange('showDescription')}
+		                        value="showDescription" />
+		                 }
+		                 label="Esikatselu"
+                	 />
                 </div>
             </div>
             <div className="content">
                 {this.state.feeds.length ?
-                    this.state.feeds.map(item=><FeedItem key={item.id} item={item} showDescription={this.state.showDescription}/>) 
+                    this.state.feeds.map(item=><FeedItem key={item.id} item={item} showDescription={this.cookies.get('showDescription') === "true"}/>) 
                     : <span>Loading...</span>
                 }
             </div>

@@ -20,3 +20,17 @@
     margin: 0px;
     padding: 3px 0;
 }
+
+.nav-header a {
+	color: white;
+	text-decoration: none;
+}
+
+@media (max-width: 600px) {
+	.navigation {
+		transition: all 0.5s;
+		display: none;
+		width: 0px;
+	}
+}
+

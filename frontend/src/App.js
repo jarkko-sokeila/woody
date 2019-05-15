@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route } from "react-router-dom";
 import Navigation from './Navigation';
 import Content from './Content';
 import './App.css';
+import 'primeflex/primeflex.css';
 
 function App() {
   return (

@@ -131,6 +131,13 @@ public class ScheduledTasks {
 		description = description.replace("&#8230;", "...");
 		
 		
+		if(description.length() > 4096) {
+			log.info("description length {}", description.length());
+			description = description.substring(0, 4092) + "...";
+			log.info("description length {}", description.length());
+			log.info("description {}", description);
+		}
+		
 		return description;
 	}
 
@@ -251,7 +258,7 @@ public class ScheduledTasks {
 		}
 		
 		//Resolve IT sub categories
-		else if(categoryBelongs(categoryName, null, new Compare("Tietotekniikka", "Mobiili", "Pelit", "Digitalous", "Android", "Teknologia"))) {
+		else if(categoryBelongs(categoryName, null, new Compare("Tietotekniikka", "Mobiili", "Pelit", "Digitalous", "Android", "Teknologia", "Digitoday", "Tietoturva"))) {
 			return new CategoryData(Category.IT, null);
 		}
 		

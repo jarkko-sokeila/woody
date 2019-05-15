@@ -5,7 +5,7 @@ class FeedItem extends React.Component {
 	
   getDate(date) {
 	  var d = new Date(date);
-	  console.log(d);
+	  /*console.log(d);*/
 	  var hours = d.getHours()
 	  if(hours < 10) {
 		  hours = "0" + hours;
@@ -15,11 +15,16 @@ class FeedItem extends React.Component {
 		  minutes = "0" + minutes;
 	  }
 	  
+	  var currentDate = new Date()
+	  if(d.getDate() < currentDate.getDate()) {
+		  return d.getDate() + "." + (d.getMonth() + 1) + " " + hours + ":" + minutes
+	  }
+	  
 	  return hours + ":" + minutes
   }
 
   getSource(source, subCategory) {
-    console.log("source: " + source + ", subCategory: " + subCategory)
+    /*console.log("source: " + source + ", subCategory: " + subCategory)*/
     
     if(source === 'ILTALEHTI') {
         source = "Iltalehti"
@@ -118,17 +123,25 @@ class FeedItem extends React.Component {
   render() {
     return (
         <div className="feedItem">
-        	<div className="cell text">
-        		<a href={this.props.item.link} target="_blank" rel="noopener noreferrer" >{this.props.item.title}</a>
-                {this.props.showDescription &&
-                    <p>{this.props.item.description}</p>
-                }
-        	</div>
-        	<div className="cell source">
-        		<p>{this.getSource(this.props.item.rssSource, this.props.item.subCategory)}</p>
-        	</div>
-        	<div className="cell published">
-	    		<p>{this.getDate(this.props.item.published)}</p>
+	        <div className="p-grid p-nogutter">
+	        	<div className="p-col-12 p-md-10 p-lg-10">
+		        	<div className="cell text">
+		        		<a href={this.props.item.link} target="_blank" rel="noopener noreferrer" >{this.props.item.title}</a>
+		                {this.props.showDescription &&
+		                    <p>{this.props.item.description}</p>
+		                }
+		        	</div>
+	        	</div>
+	        	<div className="p-col-3 p-md-1 p-lg-1">
+		        	<div className="cell source">
+		        		<p>{this.getSource(this.props.item.rssSource, this.props.item.subCategory)}</p>
+		        	</div>
+		        </div>
+	        	<div className="p-col-2 p-md-1 p-lg-1">
+		        	<div className="cell published">
+			    		<p>{this.getDate(this.props.item.published)}</p>
+			    	</div>
+			    </div>
 	    	</div>
         </div>
     );
