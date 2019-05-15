@@ -16,6 +16,7 @@ class Content extends React.Component {
     this.state = {
       data: null,
       feeds: [],
+      showDescription: this.cookies.get('showDescription') === 'true'
     };
 
     console.log("cookie showDescription " + this.cookies.get('showDescription'))
@@ -23,6 +24,7 @@ class Content extends React.Component {
   }
 
   handleChange = name => event => {
+	this.setState({showDescription: event.target.checked})
     this.cookies.set('showDescription', event.target.checked);
     console.log("cookie showDescription " + this.cookies.get('showDescription'))
   };

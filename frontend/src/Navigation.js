@@ -3,15 +3,28 @@ import Button from './Button';
 import './Navigation.css';
 
 class Navigation extends React.Component {
+	constructor(props) {
+	    super(props);
+	    this.state = {
+	      selectedCategory: window.location.pathname,
+	    };
+	    
+	    this.categorySelected = this.categorySelected.bind(this);
+	}
+	
+	categorySelected(category) {
+		this.setState({ selectedCategory: category });
+	}
+	
   render() {
     return (
         <div className="navigation">
             <div className="nav-header"><a href="/"><p>WooDy</p></a></div>
-            <Button text="Etusivu" link="/"/>
-            <Button text="Uutiset" link="/news"/>
-            <Button text="Urheilu" link="/sports"/>
-            <Button text="IT" link="/it"/>
-            <Button text="Viihde" link="/entertainment"/>
+            <Button text="Etusivu" link="/" selectedCategory={this.state.selectedCategory} onCategoryChanged={this.categorySelected} />
+            <Button text="Uutiset" link="/news"selectedCategory={this.state.selectedCategory} onCategoryChanged={this.categorySelected} />
+            <Button text="Urheilu" link="/sports"selectedCategory={this.state.selectedCategory} onCategoryChanged={this.categorySelected} />
+            <Button text="IT" link="/it" selectedCategory={this.state.selectedCategory} onCategoryChanged={this.categorySelected} />
+            <Button text="Viihde" link="/entertainment" selectedCategory={this.state.selectedCategory} onCategoryChanged={this.categorySelected} />
             {/*<SplitButton/>*/}
 
             

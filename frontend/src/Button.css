@@ -9,9 +9,12 @@
   cursor: pointer;
 }
 
+.btn.selected {
+	background-color: #171717;
+}
+
 .btn.selected span {
     color: green;
-    background-color: #171717;
 }
 
 a {
