@@ -8,8 +8,23 @@ class Navigation extends React.Component {
 	    this.state = {
 	      selectedCategory: window.location.pathname,
 	    };
-	    
+	    this.nav = React.createRef();
 	    this.categorySelected = this.categorySelected.bind(this);
+	    this.toggle = this.toggle.bind(this);
+	}
+	
+	componentDidMount(){
+		//var ReactDOM = require('react-dom');
+		//var elem = ReactDOM.findDOMNode(this.refs.nav);
+		//elem.classList.toggle('visible');
+		//console.log("elem style: " + elem.currentStyle); 
+		//console.log("navigation style display: " + elem.style.getPropertyValue('margin')); 
+	}
+	
+	toggle() {
+		var elem = this.nav.current;
+		console.log("elem: " + elem); 
+		elem.classList.toggle('visible')
 	}
 	
 	categorySelected(category) {
@@ -18,13 +33,14 @@ class Navigation extends React.Component {
 	
   render() {
     return (
-        <div className="navigation">
+        <div ref={this.nav} className="navigation">
             <div className="nav-header"><a href="/"><p>WooDy</p></a></div>
             <Button text="Etusivu" link="/" selectedCategory={this.state.selectedCategory} onCategoryChanged={this.categorySelected} />
             <Button text="Uutiset" link="/news"selectedCategory={this.state.selectedCategory} onCategoryChanged={this.categorySelected} />
             <Button text="Urheilu" link="/sports"selectedCategory={this.state.selectedCategory} onCategoryChanged={this.categorySelected} />
             <Button text="IT" link="/it" selectedCategory={this.state.selectedCategory} onCategoryChanged={this.categorySelected} />
             <Button text="Viihde" link="/entertainment" selectedCategory={this.state.selectedCategory} onCategoryChanged={this.categorySelected} />
+            {/*<div onClick={this.toggle}>toggle</div>*/}
             {/*<SplitButton/>*/}
 
             

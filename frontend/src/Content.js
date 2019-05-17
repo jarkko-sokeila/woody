@@ -1,5 +1,6 @@
 import React from 'react';
 import {faArrowCircleUp} from "@fortawesome/free-solid-svg-icons";
+import {faBars} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Cookies from 'universal-cookie';
@@ -21,6 +22,7 @@ class Content extends React.Component {
 
     console.log("cookie showDescription " + this.cookies.get('showDescription'))
     this.getFeeds = this.getFeeds.bind(this);
+    this.toggleMenu = this.toggleMenu.bind(this);
   }
 
   handleChange = name => event => {
@@ -94,6 +96,11 @@ class Content extends React.Component {
       document.getElementById("topBtn").style.display = "none";
     }
   }
+  
+  toggleMenu() {
+	  console.log('Toggle menu')
+	  this.props.onToggle();
+  }
 
   topFunction = (event) => {
 	  console.log('Back to top')
@@ -105,7 +112,7 @@ class Content extends React.Component {
     return (
         <div>
             <div className="header">
-                <div className="header-title"><span>{this.getHeaderTitle()}</span></div> {/* News, {this.state.data}*/}
+                <div className="header-title"><FontAwesomeIcon icon={faBars} onClick={this.toggleMenu} id="menuBtn" /><span>{this.getHeaderTitle()}</span></div> {/* News, {this.state.data}*/}
                 <div className="test">
                 	<FormControlLabel
 		                control={

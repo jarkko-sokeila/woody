@@ -24,7 +24,7 @@
 }
 
 .header .header-title {
-    padding-top: 3px;
+    padding-top: 7px;
 }
 
 .header > .test {
@@ -66,12 +66,25 @@
   color: red;
 }
 
+#menuBtn {
+	padding-right: 10px;
+	display: none;
+}
+
 @media (max-width: 576px) {
+	#menuBtn {
+		display: inline-block;
+	}
+
 	.content, .header, .footer {
 		margin-left: 0px;
 	}
 	
 	.header {
 		width: 100%;
+	}
+	
+	.header > .test {
+	    flex: 0 0 150px
 	}
 }

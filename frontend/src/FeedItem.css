@@ -49,6 +49,8 @@
 .feedItem:nth-child(even) {background: #f9f9f9;}
 .feedItem:nth-child(odd) {background: #ffffff}
 
+.feedItem:hover {background: #ece9e9}
+
 @media (max-width: 576px) {
 	.feedItem .source {
 		padding-left: 20px;

@@ -97,8 +97,8 @@ public class ScheduledTasks {
 	            }
 			}
         }  catch (Exception e) {
-            log.error("Error while reading rss source", e);
-            log.error("Url trying to read was {}", url);
+            log.debug("Error while reading rss source", e);
+            log.debug("Url trying to read was {}", url);
         }
 	}
 
