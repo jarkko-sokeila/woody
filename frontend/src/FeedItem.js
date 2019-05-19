@@ -2,6 +2,11 @@ import React from 'react';
 import './FeedItem.css';
 
 class FeedItem extends React.Component {
+    constructor(props) {
+        super(props);
+        
+        this.showHeader = true
+  }
 	
   getDate(date) {
 	  var d = new Date(date);
@@ -123,6 +128,25 @@ class FeedItem extends React.Component {
   render() {
     return (
         <div className="feedItem">
+            {this.props.showHeader ? (
+                <div className="p-grid p-nogutter feedItem-header">
+                    <div className="p-col-12 p-md-10 p-lg-10 p-nogutter">
+                        <div className="cell text">
+                            <span>Nyt</span>
+                        </div>
+                    </div>
+                    <div className="p-col-3 p-md-1 p-lg-1 p-nogutter">
+                        <div className="cell source">
+                            <span>Lähde</span>
+                        </div>
+                    </div>
+                    <div className="p-col-2 p-md-1 p-lg-1 p-nogutter">
+                        <div className="cell published">
+                            <span>Julkaistu</span>
+                        </div>
+                    </div>
+                </div>
+            ) : null}
 	        <div className="p-grid p-nogutter">
 	        	<div className="p-col-12 p-md-10 p-lg-10">
 		        	<div className="cell text">

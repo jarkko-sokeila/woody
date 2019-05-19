@@ -3,6 +3,19 @@
 	width: 100%;
 }
 
+.feedItem .feedItem-header {
+	border-bottom: 1px solid green;
+}
+
+.feedItem .feedItem-header .cell {
+	padding-top: 0px;
+	padding-bottom: 0px;
+}
+
+.feedItem .feedItem-header .source, .feedItem .feedItem-header .published {
+	padding-top: 6px;
+}
+
 .feedItem .cell {
 	padding-top: 5px;
 	padding-bottom: 8px;
@@ -61,5 +74,9 @@
     	padding-top: 0px;
     	padding-bottom: 0px;
 	}
+
+    .feedItem .feedItem-header .source, .feedItem .feedItem-header .published {
+        display: none;
+    }
 }
 

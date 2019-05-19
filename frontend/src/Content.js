@@ -12,17 +12,22 @@ import './Content.css';
 
 class Content extends React.Component {
     constructor(props) {
-    super(props);
-    this.cookies = new Cookies();
-    this.state = {
-      data: null,
-      feeds: [],
-      showDescription: this.cookies.get('showDescription') === 'true'
-    };
+        super(props);
+        this.cookies = new Cookies();
+        console.log("cookie: " + this.cookies.get('showDescription'))
 
-    console.log("cookie showDescription " + this.cookies.get('showDescription'))
-    this.getFeeds = this.getFeeds.bind(this);
-    this.toggleMenu = this.toggleMenu.bind(this);
+        this.state = {
+            data: null,
+            feeds: [],
+            showDescription: typeof this.cookies.get('showDescription') === 'undefined' ? 'true': this.cookies.get('showDescription')
+        };
+
+        this.test = 0;
+        console.log("this.state showDescription " + this.state.showDescription)
+        this.getFeeds = this.getFeeds.bind(this);
+        this.toggleMenu = this.toggleMenu.bind(this);
+        this.showHeader = this.showHeader.bind(this);
+        this.renderFeedItems = this.renderFeedItems.bind(this);
   }
 
   handleChange = name => event => {
@@ -107,6 +112,23 @@ class Content extends React.Component {
 	  document.body.scrollTop = 0;
 	  document.documentElement.scrollTop = 0;
   }
+
+  showHeader(item) {
+      console.log("test loop value " + this.test)
+      if(this.test === 0) {
+        this.test++
+        return true
+      }
+    
+      this.test++
+      return false
+  }
+
+  renderFeedItems(item, i) {
+    console.log("Test")
+    var showHeader = this.showHeader(item)
+    return <FeedItem key={item.id} item={item} showDescription={this.state.showDescription} showHeader={showHeader} />
+  }
   
   render() {
     return (
@@ -116,7 +138,7 @@ class Content extends React.Component {
                 <div className="test">
                 	<FormControlLabel
 		                control={
-		                    <Switch checked={this.cookies.get('showDescription') === "true" }
+		                    <Switch checked={this.state.showDescription === 'true'}
 		                        onChange={this.handleChange('showDescription')}
 		                        value="showDescription" />
 		                 }
@@ -126,7 +148,7 @@ class Content extends React.Component {
             </div>
             <div className="content">
                 {this.state.feeds.length ?
-                    this.state.feeds.map(item=><FeedItem key={item.id} item={item} showDescription={this.cookies.get('showDescription') === "true"}/>) 
+                    this.state.feeds.map(this.renderFeedItems) 
                     : <span>Loading...</span>
                 }
             </div>
