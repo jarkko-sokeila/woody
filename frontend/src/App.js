@@ -13,6 +13,7 @@ class App extends React.Component {
 	    };
 	    
 	    this.nav = React.createRef();
+	    this.overlay = React.createRef();
 	    this.toggleMenu = this.toggleMenu.bind(this);
 	    this.Home = this.Home.bind(this);
 	    this.News = this.News.bind(this);
@@ -26,6 +27,10 @@ class App extends React.Component {
 		//this.setState({menuVisible: !this.menuVisible})
 		console.log("App toggle menu ")
 		this.nav.current.toggle();
+		
+		var elem = this.overlay.current;
+		console.log("elem: " + elem); 
+		elem.classList.toggle('display')
 	}
 	
 	setIsMenuOpen(isOpen) {
@@ -57,6 +62,7 @@ render() {
   return (
       <Router>
         <div className="app">
+        	<div ref={this.overlay} onClick={this.toggleMenu} id="overlay"></div>
             <Navigation ref={this.nav} onInit={this.setIsMenuOpen} />
 
             <Route exact path="/" component={this.Home} />
@@ -65,7 +71,7 @@ render() {
             <Route path="/it" component={this.IT} />
             <Route path="/entertainment" component={this.Entertainment} />
         </div>
-    </Router>
+      </Router>
   );
 	}
 }

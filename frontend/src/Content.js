@@ -19,21 +19,26 @@ class Content extends React.Component {
         this.state = {
             data: null,
             feeds: [],
-            showDescription: typeof this.cookies.get('showDescription') === 'undefined' ? 'true': this.cookies.get('showDescription')
+            showDescription: typeof this.cookies.get('showDescription') === 'undefined' ? true: this.cookies.get('showDescription') === 'true'
         };
 
-        this.test = 0;
+        this.timeIndex = 0;
+        this.timeGroups = [0, 5, 10, 30, 60, 120]
+        this.timeGroupsBool = [true, true, true, true, true, true]
         console.log("this.state showDescription " + this.state.showDescription)
         this.getFeeds = this.getFeeds.bind(this);
         this.toggleMenu = this.toggleMenu.bind(this);
         this.showHeader = this.showHeader.bind(this);
         this.renderFeedItems = this.renderFeedItems.bind(this);
+        this.checkTimeDifference = this.checkTimeDifference.bind(this);
   }
 
   handleChange = name => event => {
+	this.timeIndex = 0;
+	this.timeGroupsBool = [true, true, true, true, true, true]
 	this.setState({showDescription: event.target.checked})
     this.cookies.set('showDescription', event.target.checked);
-    console.log("cookie showDescription " + this.cookies.get('showDescription'))
+    console.log("event: " + event.target.checked + " ,state showDescription: " + this.state.showDescription + " ,cookie showDescription: " + this.cookies.get('showDescription'))
   };
 
   getData() {
@@ -114,18 +119,82 @@ class Content extends React.Component {
   }
 
   showHeader(item) {
-      console.log("test loop value " + this.test)
-      if(this.test === 0) {
-        this.test++
-        return true
+      //console.log("test loop value " + this.test)
+	  var currentDate = new Date()
+	  var published = new Date(item.published)
+	  var difference = (currentDate.getTime() - published.getTime())
+	  console.log("current date: " + currentDate.toLocaleString() + " ,published: " + published.toLocaleString() + " ,difference: " + difference)
+	  
+      if(this.timeGroupsBool[0] === true && difference < this.minToMs(5)) {
+    	  this.timeGroupsBool[0] = false
+    	  return 0
+      }
+	  
+	  if(this.timeGroupsBool[1] === true && difference >= this.minToMs(5) && difference < this.minToMs(10)) {
+    	  this.timeGroupsBool[1] = false
+    	  return 5
+      }
+	  
+	  if(this.timeGroupsBool[2] === true && difference >= this.minToMs(10) && difference < this.minToMs(30)) {
+    	  this.timeGroupsBool[2] = false
+    	  return 10
+      }
+	  
+	  if(this.timeGroupsBool[3] === true && difference >= this.minToMs(30) && difference < this.minToMs(60)) {
+    	  this.timeGroupsBool[3] = false
+    	  return 30
       }
     
-      this.test++
-      return false
+	  if(this.timeGroupsBool[4] === true && difference >= this.minToMs(60) && difference < this.minToMs(120)) {
+    	  this.timeGroupsBool[4] = false
+    	  return 60
+      }
+	  
+	  if(this.timeGroupsBool[5] === true && difference >= this.minToMs(120)) {
+    	  this.timeGroupsBool[5] = false
+    	  return 120
+      }
+	  
+      return undefined
+  }
+  
+  /*showHeader(item) {
+      //console.log("test loop value " + this.test)
+	  var currentDate = new Date()
+	  var published = new Date(item.published)
+	  var difference = (currentDate.getTime() - published.getTime())
+	  console.log("current date: " + currentDate.toLocaleString() + " ,published: " + published.toLocaleString() + " ,difference: " + difference)
+	  
+      if(this.timeIndex === 0) {
+        this.timeIndex++
+        return 0
+      }
+    
+	  console.log("Test timegroup with index " + this.timeIndex)
+      if(this.timeIndex < this.timeGroups.length && this.checkTimeDifference(this.timeGroups[this.timeIndex], difference)) {
+    	  var header = this.timeGroups[this.timeIndex]
+    	  this.timeIndex++
+    	  return header
+      }
+	  
+      return undefined
+  }*/
+  
+  minToMs(min) {
+	  return min * 60 * 1000
+  }
+  
+  checkTimeDifference(time, difference) {
+	  console.log("is difference " + difference + " higher than " + (time * 60 * 1000) + " , time " + time)
+	  if(difference > (time * 60 * 1000)) {
+		  return true
+	  }
+	  
+	  return false
   }
 
   renderFeedItems(item, i) {
-    console.log("Test")
+    //console.log("Test")
     var showHeader = this.showHeader(item)
     return <FeedItem key={item.id} item={item} showDescription={this.state.showDescription} showHeader={showHeader} />
   }
@@ -134,11 +203,13 @@ class Content extends React.Component {
     return (
         <div>
             <div className="header">
-                <div className="header-title"><FontAwesomeIcon icon={faBars} onClick={this.toggleMenu} id="menuBtn" /><span>{this.getHeaderTitle()}</span></div> {/* News, {this.state.data}*/}
+                <div className="header-title">
+                	<FontAwesomeIcon icon={faBars} onClick={this.toggleMenu} id="menuBtn" />
+                	<span>{this.getHeaderTitle()}</span></div> {/* News, {this.state.data}*/}
                 <div className="test">
                 	<FormControlLabel
 		                control={
-		                    <Switch checked={this.state.showDescription === 'true'}
+		                    <Switch checked={this.state.showDescription}
 		                        onChange={this.handleChange('showDescription')}
 		                        value="showDescription" />
 		                 }

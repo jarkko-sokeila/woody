@@ -4,16 +4,21 @@
 }
 
 .feedItem .feedItem-header {
-	border-bottom: 1px solid green;
+	background: #ffffff;
+	border-bottom: 2px solid green;
+}
+
+.feedItem .feedItem-header .text {
+	color: green;
 }
 
 .feedItem .feedItem-header .cell {
-	padding-top: 0px;
-	padding-bottom: 0px;
+	padding-top: 4px;
+	padding-bottom: 4px;
 }
 
 .feedItem .feedItem-header .source, .feedItem .feedItem-header .published {
-	padding-top: 6px;
+	padding-top: 10px;
 }
 
 .feedItem .cell {
@@ -62,7 +67,7 @@
 .feedItem:nth-child(even) {background: #f9f9f9;}
 .feedItem:nth-child(odd) {background: #ffffff}
 
-.feedItem:hover {background: #ece9e9}
+.feedItem .feedItem-content:hover {background: #ece9e9}
 
 @media (max-width: 576px) {
 	.feedItem .source {

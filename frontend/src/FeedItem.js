@@ -5,7 +5,8 @@ class FeedItem extends React.Component {
     constructor(props) {
         super(props);
         
-        this.showHeader = true
+        this.showHeader = this.showHeader.bind(this);
+        this.getHeaderText = this.getHeaderText.bind(this);
   }
 	
   getDate(date) {
@@ -124,15 +125,33 @@ class FeedItem extends React.Component {
 
       return subCategory
   }
+  
+  showHeader() {
+	if(this.props.showHeader === undefined)
+		return false
+		  
+	return true;
+  }
+  
+  getHeaderText() {
+	if(this.props.showHeader === 0)
+		return 'NYT'
+	else if(this.props.showHeader === 60)
+		return '1 TUNTI'
+	else if(this.props.showHeader === 120)
+		return '2 TUNTIA'
+	else
+		return this.props.showHeader + ' MIN'	  
+  }
 	
   render() {
     return (
         <div className="feedItem">
-            {this.props.showHeader ? (
+            {this.showHeader() ? (
                 <div className="p-grid p-nogutter feedItem-header">
                     <div className="p-col-12 p-md-10 p-lg-10 p-nogutter">
                         <div className="cell text">
-                            <span>Nyt</span>
+                            <span>{this.getHeaderText()}</span>
                         </div>
                     </div>
                     <div className="p-col-3 p-md-1 p-lg-1 p-nogutter">
@@ -147,7 +166,7 @@ class FeedItem extends React.Component {
                     </div>
                 </div>
             ) : null}
-	        <div className="p-grid p-nogutter">
+	        <div className="p-grid p-nogutter feedItem-content">
 	        	<div className="p-col-12 p-md-10 p-lg-10">
 		        	<div className="cell text">
 		        		<a href={this.props.item.link} target="_blank" rel="noopener noreferrer" >{this.props.item.title}</a>
