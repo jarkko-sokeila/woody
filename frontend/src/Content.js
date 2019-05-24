@@ -22,7 +22,8 @@ class Content extends React.Component {
             showDescription: typeof this.cookies.get('showDescription') === 'undefined' ? true: this.cookies.get('showDescription') === 'true'
         };
 
-        this.timeIndex = 0;
+        this.lastFetchTime= null
+        this.timeIndex = 0
         this.timeGroups = [0, 5, 10, 30, 60, 120]
         this.timeGroupsBool = [true, true, true, true, true, true]
         console.log("this.state showDescription " + this.state.showDescription)
@@ -31,13 +32,14 @@ class Content extends React.Component {
         this.showHeader = this.showHeader.bind(this);
         this.renderFeedItems = this.renderFeedItems.bind(this);
         this.checkTimeDifference = this.checkTimeDifference.bind(this);
+        this.tick = this.tick.bind(this);
   }
 
   handleChange = name => event => {
-	this.timeIndex = 0;
+	this.timeIndex = 0
 	this.timeGroupsBool = [true, true, true, true, true, true]
 	this.setState({showDescription: event.target.checked})
-    this.cookies.set('showDescription', event.target.checked);
+    this.cookies.set('showDescription', event.target.checked)
     console.log("event: " + event.target.checked + " ,state showDescription: " + this.state.showDescription + " ,cookie showDescription: " + this.cookies.get('showDescription'))
   };
 
@@ -45,6 +47,8 @@ class Content extends React.Component {
     fetch('/rest/test')
         .then(response => response.text())
         .then(data => this.setState({ data }));
+    
+    this.lastFetchTime = new Date()
   }
 
   getFeeds() {
@@ -87,6 +91,23 @@ class Content extends React.Component {
     this.getData();
     this.getFeeds();
     this.onTopInit();
+    this.timerID = setInterval(() => this.tick(),1000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timerID);
+  }
+
+  tick() {
+	  //console.log("Last fetch time: " + this.lastFetchTime)
+	  /*fetch("/rest/unreadcount?datetime=" + this.lastFetchTime.getTime())
+      .then(function(response) {
+          //console.log(response);
+          return response.text();
+      })
+      .then(function(count) {
+          console.log("Unread count is " + count);
+      });*/
   }
   
   onTopInit() {
@@ -123,7 +144,7 @@ class Content extends React.Component {
 	  var currentDate = new Date()
 	  var published = new Date(item.published)
 	  var difference = (currentDate.getTime() - published.getTime())
-	  console.log("current date: " + currentDate.toLocaleString() + " ,published: " + published.toLocaleString() + " ,difference: " + difference)
+	  //console.log("current date: " + currentDate.toLocaleString() + " ,published: " + published.toLocaleString() + " ,difference: " + difference)
 	  
       if(this.timeGroupsBool[0] === true && difference < this.minToMs(5)) {
     	  this.timeGroupsBool[0] = false

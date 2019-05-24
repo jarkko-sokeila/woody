@@ -4,6 +4,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -115,6 +116,7 @@ public class ScheduledTasks {
 		entity.setPublished(entry.getPublishedDate());
 		entity.setCategory(categoryData != null ? categoryData.getCategory(): category);
 		entity.setSubCategory(categoryData != null ? categoryData.getSubCategory() : null);
+		entity.setCreated(Calendar.getInstance().getTime());
 		
 		feedRepository.save(entity);
 	}

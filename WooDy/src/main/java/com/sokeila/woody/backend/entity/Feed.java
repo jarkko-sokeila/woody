@@ -41,6 +41,9 @@ public class Feed {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "C_SUB_CATEGORY")
 	private SubCategory subCategory;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "C_CREATED")
+	private Date created;
 	
 	public long getId() {
 		return id;
@@ -95,6 +98,14 @@ public class Feed {
 	}
 	public void setSubCategory(SubCategory subCategory) {
 		this.subCategory = subCategory;
+	}
+	
+	public Date getCreated() {
+		return created;
+	}
+	
+	public void setCreated(Date created) {
+		this.created = created;
 	}
 	
 	@Override

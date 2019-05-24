@@ -1,6 +1,7 @@
 package com.sokeila.woody.backend.services;
 
 import java.util.Collection;
+import java.util.Date;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,4 +20,6 @@ public interface FeedRepository extends PagingAndSortingRepository<Feed, Long> {
 	
 	public Page<Feed> findByOrderByPublishedDesc(Pageable pageable);
 	public Page<Feed> findByCategoryOrderByPublishedDesc(Category category,Pageable pageable);
+	
+	long countByCreatedGreaterThan(Date date);
 }
