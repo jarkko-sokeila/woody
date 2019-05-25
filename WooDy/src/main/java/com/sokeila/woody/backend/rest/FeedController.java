@@ -62,6 +62,7 @@ public class FeedController {
 		}
 		
 		log.debug("UnreadCount after date " + dateToString(date) + " in category " + category + " is " + unreadCount);
+
 		return unreadCount;
 	}
 	
