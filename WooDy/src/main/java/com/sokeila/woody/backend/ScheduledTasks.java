@@ -1,7 +1,6 @@
 package com.sokeila.woody.backend;
 
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -11,7 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import javax.net.ssl.SSLContext;
 
@@ -37,7 +35,7 @@ public class ScheduledTasks {
 
     private static final Logger log = LoggerFactory.getLogger(ScheduledTasks.class);
 
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+    //private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
     @Autowired
     private FeedRepository feedRepository;
@@ -108,15 +106,16 @@ public class ScheduledTasks {
 		
 		CategoryData categoryData = resolveCategoryData(entry);
 		
+		Date now = Calendar.getInstance().getTime();
 		entity.setRssSource(rssSource);
 		entity.setTitle(entry.getTitle());
 		entity.setDescription(formatDescription(entry.getDescription() != null ? entry.getDescription().getValue(): null));
 		entity.setGuid(entry.getUri());
 		entity.setLink(entry.getLink());
-		entity.setPublished(entry.getPublishedDate());
+		entity.setPublished(entry.getPublishedDate().after(now) ? now: entry.getPublishedDate());
 		entity.setCategory(categoryData != null ? categoryData.getCategory(): category);
 		entity.setSubCategory(categoryData != null ? categoryData.getSubCategory() : null);
-		entity.setCreated(Calendar.getInstance().getTime());
+		entity.setCreated(now);
 		
 		feedRepository.save(entity);
 	}
@@ -131,7 +130,7 @@ public class ScheduledTasks {
 		description = description.replace("&#8221;", "\"");
 		description = description.replace("&#8211;", "-");
 		description = description.replace("&#8230;", "...");
-		
+		description = description.replace("&#8217;", "’");
 		
 		if(description.length() > 4096) {
 			log.info("description length {}", description.length());
