@@ -1,14 +1,14 @@
 import React from 'react';
 import {faArrowCircleUp} from "@fortawesome/free-solid-svg-icons";
 import {faBars} from "@fortawesome/free-solid-svg-icons";
+import {faSyncAlt} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Badge from '@material-ui/core/Badge';
 import Cookies from 'universal-cookie';
 import Switch from '@material-ui/core/Switch';
 import FeedItem from './FeedItem';
 import './Content.css';
-
-
 
 class Content extends React.Component {
     constructor(props) {
@@ -19,6 +19,7 @@ class Content extends React.Component {
         this.state = {
             data: null,
             feeds: [],
+            unreadCount: 0,
             showDescription: typeof this.cookies.get('showDescription') === 'undefined' ? true: this.cookies.get('showDescription') === 'true'
         };
 
@@ -28,8 +29,9 @@ class Content extends React.Component {
         this.timeGroupsBool = [true, true, true, true, true, true]
         console.log("this.state showDescription " + this.state.showDescription)
         this.getFeeds = this.getFeeds.bind(this);
-        this.toggleMenu = this.toggleMenu.bind(this);
         this.showHeader = this.showHeader.bind(this);
+        this.toggleMenu = this.toggleMenu.bind(this);
+        this.getData = this.getData.bind(this);
         this.renderFeedItems = this.renderFeedItems.bind(this);
         this.checkTimeDifference = this.checkTimeDifference.bind(this);
         this.tick = this.tick.bind(this);
@@ -47,8 +49,6 @@ class Content extends React.Component {
     fetch('/rest/test')
         .then(response => response.text())
         .then(data => this.setState({ data }));
-    
-    this.lastFetchTime = new Date()
   }
 
   getFeeds() {
@@ -60,6 +60,8 @@ class Content extends React.Component {
     } else {
         url = "/rest/news?category=" + category;
     }
+    this.setState({unreadCount: 0})
+    this.timeGroupsBool = [true, true, true, true, true, true]
     console.log("Read news from url " + url)
     fetch(url)
         .then(function(response) {
@@ -68,8 +70,11 @@ class Content extends React.Component {
         })
         .then(function(feeds) {
             console.log(feeds.content);
+            content.timeGroupsBool = [true, true, true, true, true, true]
             content.setState({ feeds: feeds.content });
         });
+
+    this.lastFetchTime = new Date()
   }
 
   getHeaderTitle() {
@@ -99,15 +104,27 @@ class Content extends React.Component {
   }
 
   tick() {
-	  //console.log("Last fetch time: " + this.lastFetchTime)
-	  /*fetch("/rest/unreadcount?datetime=" + this.lastFetchTime.getTime())
+      //console.log("Last fetch time: " + this.lastFetchTime)
+      var category = this.props.category;
+      var content = this;
+      var url;
+      if(category === null || category === "") {
+        url = "/rest/unreadcount?datetime=" + this.lastFetchTime.getTime();
+      } else {
+        url = "/rest/unreadcount?category=" + category + "&datetime=" + this.lastFetchTime.getTime();
+      }
+	  fetch(url)
       .then(function(response) {
           //console.log(response);
           return response.text();
       })
       .then(function(count) {
-          console.log("Unread count is " + count);
-      });*/
+          //console.log("Unread count is " + count + " state unread count " + content.state.unreadCount);
+          if(content.state.unreadCount !== parseInt(count)) {
+            content.timeGroupsBool = [true, true, true, true, true, true]
+            content.setState({unreadCount: parseInt(count)})
+          }
+      });
   }
   
   onTopInit() {
@@ -217,6 +234,7 @@ class Content extends React.Component {
   renderFeedItems(item, i) {
     //console.log("Test")
     var showHeader = this.showHeader(item)
+    //console.log("Show header " + showHeader)
     return <FeedItem key={item.id} item={item} showDescription={this.state.showDescription} showHeader={showHeader} />
   }
   
@@ -226,7 +244,17 @@ class Content extends React.Component {
             <div className="header">
                 <div className="header-title">
                 	<FontAwesomeIcon icon={faBars} onClick={this.toggleMenu} id="menuBtn" />
-                	<span>{this.getHeaderTitle()}</span></div> {/* News, {this.state.data}*/}
+                	<span>{this.getHeaderTitle()}</span>
+                </div> {/* News, {this.state.data}*/}
+                {this.state.unreadCount > 0 ?
+                    <div className="header-refresh" onClick={this.getFeeds}>
+                        <Badge className="refresh-badge" badgeContent={this.state.unreadCount} color="secondary">
+                            <FontAwesomeIcon className="refresh-icon" icon={faSyncAlt}  />
+                        </Badge>
+                        <span className="refresh-text">Lataa uutiset</span>
+                    </div>
+                    : <div className="refresh-empty"></div>
+                }
                 <div className="test">
                 	<FormControlLabel
 		                control={

@@ -21,14 +21,15 @@
 	padding-top: 10px;
 }
 
-.feedItem .cell {
-	padding-top: 5px;
-	padding-bottom: 8px;
-}
+/*.feedItem .cell {
+
+}*/
 
 .feedItem .text {
 	padding-left: 20px;
-	padding-right: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+	padding-bottom: 8px;
 }
 
 .feedItem .text p {

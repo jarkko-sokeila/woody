@@ -22,4 +22,5 @@ public interface FeedRepository extends PagingAndSortingRepository<Feed, Long> {
 	public Page<Feed> findByCategoryOrderByPublishedDesc(Category category,Pageable pageable);
 	
 	long countByCreatedGreaterThan(Date date);
+	long countByCategoryAndCreatedGreaterThan(Category category, Date date);
 }
