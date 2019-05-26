@@ -2,6 +2,7 @@ import React from 'react';
 import {faArrowCircleUp} from "@fortawesome/free-solid-svg-icons";
 import {faBars} from "@fortawesome/free-solid-svg-icons";
 import {faSyncAlt} from "@fortawesome/free-solid-svg-icons";
+import {faCog} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Badge from '@material-ui/core/Badge';
@@ -34,6 +35,7 @@ class Content extends React.Component {
         this.getData = this.getData.bind(this);
         this.renderFeedItems = this.renderFeedItems.bind(this);
         this.checkTimeDifference = this.checkTimeDifference.bind(this);
+        this.refresh = this.refresh.bind(this);
         this.tick = this.tick.bind(this);
   }
 
@@ -75,6 +77,11 @@ class Content extends React.Component {
         });
 
     this.lastFetchTime = new Date()
+  }
+
+  refresh() {
+    this.topFunction()
+    this.getFeeds()
   }
 
   getHeaderTitle() {
@@ -150,7 +157,7 @@ class Content extends React.Component {
 	  this.props.onToggle();
   }
 
-  topFunction = (event) => {
+  topFunction() {
 	  console.log('Back to top')
 	  document.body.scrollTop = 0;
 	  document.documentElement.scrollTop = 0;
@@ -247,7 +254,7 @@ class Content extends React.Component {
                 	<span>{this.getHeaderTitle()}</span>
                 </div> {/* News, {this.state.data}*/}
                 {this.state.unreadCount > 0 ?
-                    <div className="header-refresh" onClick={this.getFeeds}>
+                    <div className="header-refresh" onClick={this.refresh}>
                         <Badge className="refresh-badge" badgeContent={this.state.unreadCount} color="secondary">
                             <FontAwesomeIcon className="refresh-icon" icon={faSyncAlt}  />
                         </Badge>
@@ -255,7 +262,7 @@ class Content extends React.Component {
                     </div>
                     : <div className="refresh-empty"></div>
                 }
-                <div className="test">
+                <div className="description">
                 	<FormControlLabel
 		                control={
 		                    <Switch checked={this.state.showDescription}
@@ -264,6 +271,22 @@ class Content extends React.Component {
 		                 }
 		                 label="Esikatselu"
                 	 />
+                </div>
+                <div className="menu">
+                    <FontAwesomeIcon className="menu-icon" icon={faCog} />
+                    <div className="menu-content">
+                        <a href="#">Link 1</a>
+                        <a href="#">Link 2</a>
+                        <a href="#">Link 3</a>
+                        <FormControlLabel
+                            control={
+                                <Switch checked={this.state.showDescription}
+                                    onChange={this.handleChange('showDescription')}
+                                    value="showDescription" />
+                            }
+                            label="Esikatselu"
+                        />
+                    </div>
                 </div>
             </div>
             <div className="content">
