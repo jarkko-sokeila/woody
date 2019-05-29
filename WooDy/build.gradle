@@ -25,6 +25,8 @@ dependencies {
     implementation 'org.flywaydb:flyway-core'
     
     implementation 'com.rometools:rome:1.12.0'
+    implementation 'com.google.guava:guava:27.1-jre'
+    
     
     
     testImplementation 'junit:junit'

@@ -49,6 +49,10 @@
 	text-align: center;
 }
 
+.feedItem .published .eye {
+	padding-right: 5px;
+}
+
 .feedItem a {
 	font-size: 15px;
 	word-break: break-word;

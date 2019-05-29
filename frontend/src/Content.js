@@ -262,6 +262,7 @@ class Content extends React.Component {
                     </div>
                     : <div className="refresh-empty"></div>
                 }
+                {/*
                 <div className="description">
                 	<FormControlLabel
 		                control={
@@ -272,12 +273,10 @@ class Content extends React.Component {
 		                 label="Esikatselu"
                 	 />
                 </div>
+                */}
                 <div className="menu">
                     <FontAwesomeIcon className="menu-icon" icon={faCog} />
                     <div className="menu-content">
-                        <a href="#">Link 1</a>
-                        <a href="#">Link 2</a>
-                        <a href="#">Link 3</a>
                         <FormControlLabel
                             control={
                                 <Switch checked={this.state.showDescription}

@@ -31,10 +31,15 @@
 .header .header-refresh {
     cursor: pointer;
     padding-left: 30px;
+    padding-top: 4px;
 }
 
 .header .header-refresh .refresh-badge .refresh-icon {
     transform: rotate(45deg);
+}
+
+.header .header-refresh .refresh-badge {
+    font-size: 25px;
 }
 
 .header .header-refresh .refresh-text {
@@ -103,6 +108,10 @@
   right: 20px;
   top: 50px;
   z-index: 1;
+}
+
+.menu .menu-content .MuiFormControlLabel-label-6 {
+  color: #ffffff;
 }
 
 .menu .menu-content a {

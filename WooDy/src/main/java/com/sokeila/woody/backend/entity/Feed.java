@@ -1,17 +1,25 @@
 package com.sokeila.woody.backend.entity;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "T_FEED")
@@ -44,6 +52,13 @@ public class Feed {
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "C_CREATED")
 	private Date created;
+	
+	@ManyToMany(fetch = FetchType.LAZY, cascade =  CascadeType.ALL)
+	@JoinTable(name = "J_FEED_IP_HASH", joinColumns = @JoinColumn(name = "C_FEED_ID"), inverseJoinColumns = @JoinColumn(name = "C_IP_HASH_ID"))
+	private Set<IPHash> IPClicks;
+	
+	@Transient
+	private int clickCount;
 	
 	public long getId() {
 		return id;
@@ -106,6 +121,36 @@ public class Feed {
 	
 	public void setCreated(Date created) {
 		this.created = created;
+	}
+	
+	public Set<IPHash> getIPClicks() {
+		return IPClicks;
+	}
+	
+	public void setIPClicks(Set<IPHash> iPClicks) {
+		IPClicks = iPClicks;
+	}
+	
+	public int getClickCount() {
+		return clickCount;
+	}
+	
+	public void setClickCount(int clickCount) {
+		this.clickCount = clickCount;
+	}
+	
+	public void addIpClick(IPHash ipHash) {
+		if(IPClicks == null) {
+			IPClicks = new HashSet<>();
+		}
+		
+		IPClicks.add(ipHash);
+	}
+	
+	public void resolveClickCount() {
+		if(IPClicks != null) {
+			this.clickCount = IPClicks.size();
+		}
 	}
 	
 	@Override

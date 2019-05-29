@@ -1,12 +1,20 @@
 import React from 'react';
+import {faEye} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import './FeedItem.css';
 
 class FeedItem extends React.Component {
     constructor(props) {
         super(props);
         
+        this.state = {
+        	item: this.props.item,
+        };
+        
         this.showHeader = this.showHeader.bind(this);
         this.getHeaderText = this.getHeaderText.bind(this);
+        this.refresh = this.refresh.bind(this);
+        this.clickLink = this.clickLink.bind(this);
   }
 	
   getDate(date) {
@@ -143,13 +151,43 @@ class FeedItem extends React.Component {
 	else
 		return this.props.showHeader + ' MIN'	  
   }
+  
+  clickLink() {
+	  console.log("Link with id " + this.state.item.id + " clicked")
+	  var content = this;
+	  fetch('/rest/linkclick', {
+		   method: 'post',
+		   headers: {'Content-Type':'application/x-www-form-urlencoded'},
+		   body: "id="+this.state.item.id
+		  })
+		  .then(function(response) {
+	          //console.log(response);
+			  content.refresh()
+	      });
+  }
+  
+  refresh() {
+	  console.log("Refresh item id " + this.state.item.id)
+      var content = this;
+      var url = "/rest/getfeed?id=" + this.state.item.id;
+
+	  fetch(url)
+      .then(function(response) {
+          console.log(response);
+          return response.json();
+      })
+      .then(function(feed) {
+          console.log(feed);
+          content.setState({ item: feed });
+      });
+  }
 	
   render() {
     return (
         <div className="feedItem">
             {this.showHeader() ? (
                 <div className="p-grid p-nogutter feedItem-header">
-                    <div className="p-col-12 p-md-10 p-lg-10 p-nogutter">
+                    <div className="p-col-12 p-md-9 p-lg-9 p-nogutter">
                         <div className="cell text">
                             <span>{this.getHeaderText()}</span>
                         </div>
@@ -164,25 +202,35 @@ class FeedItem extends React.Component {
                             <span>Julkaistu</span>
                         </div>
                     </div>
+                    <div className="p-col p-md-1 p-lg-1 p-nogutter">
+	                    <div className="cell published">
+	                        <span>Klikit</span>
+	                    </div>
+	                </div>
                 </div>
             ) : null}
 	        <div className="p-grid p-nogutter feedItem-content">
-	        	<div className="p-col-12 p-md-10 p-lg-10">
+	        	<div className="p-col-12 p-md-9 p-lg-9">
 		        	<div className="cell text">
-		        		<a href={this.props.item.link} target="_blank" rel="noopener noreferrer" >{this.props.item.title}</a>
+		        		<a href={this.state.item.link} target="_blank" rel="noopener noreferrer" onClick={this.clickLink}>{this.state.item.title}</a>
 		                {this.props.showDescription &&
-		                    <p>{this.props.item.description}</p>
+		                    <p>{this.state.item.description}</p>
 		                }
 		        	</div>
 	        	</div>
 	        	<div className="p-col-3 p-md-1 p-lg-1">
 		        	<div className="cell source">
-		        		<p>{this.getSource(this.props.item.rssSource, this.props.item.subCategory)}</p>
+		        		<p>{this.getSource(this.state.item.rssSource, this.state.item.subCategory)}</p>
 		        	</div>
 		        </div>
 	        	<div className="p-col-2 p-md-1 p-lg-1">
 		        	<div className="cell published">
-			    		<p>{this.getDate(this.props.item.published)}</p>
+			    		<p>{this.getDate(this.state.item.published)}</p>
+			    	</div>
+			    </div>
+			    <div className="p-col p-md-1 p-lg-1">
+		        	<div className="cell published">
+			    		<p><FontAwesomeIcon icon={faEye} className="eye" />{this.state.item.clickCount}</p>
 			    	</div>
 			    </div>
 	    	</div>

@@ -1,12 +1,16 @@
 package com.sokeila.woody.backend.rest;
 
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
@@ -16,20 +20,30 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.common.hash.Hashing;
 import com.sokeila.woody.backend.entity.Category;
 import com.sokeila.woody.backend.entity.Feed;
+import com.sokeila.woody.backend.entity.IPHash;
 import com.sokeila.woody.backend.entity.RssSource;
 import com.sokeila.woody.backend.services.FeedRepository;
+import com.sokeila.woody.backend.services.IPHashRepository;
 
 @RestController
 public class FeedController {
 	private static final Logger log = LoggerFactory.getLogger(FeedController.class);
 	
+	@PersistenceContext
+    private EntityManager entityManager;
+	
 	@Autowired
     private FeedRepository feedRepository;
+	
+	@Autowired
+    private IPHashRepository ipHashRepository;
 	
 	@GetMapping(path = "/rest/news")
 	public Page<Feed> news(@RequestParam(name = "page", required = false) Integer page, @RequestParam(name = "category", required = false) Category category, HttpServletRequest request) {
@@ -47,7 +61,61 @@ public class FeedController {
 		} else {
 			result = feedRepository.findByCategoryOrderByPublishedDesc(category, pageable);
 		}
+		
+		result.get().forEach(feed -> {
+			feed.resolveClickCount();
+			feed.setIPClicks(null);
+		});
+		
 		return result;
+	}
+	
+	@GetMapping(path = "/rest/getfeed")
+	public Feed getFeed(@RequestParam(name = "id") long id) {
+
+		log.info("Find feed with id {}", id);
+
+		Optional<Feed> feedOpt = feedRepository.findById(id);
+
+		if(feedOpt.isPresent()) {
+			Feed result = feedOpt.get();
+			result.resolveClickCount();
+			result.setIPClicks(null);
+			
+			return result;
+		}
+		
+		return null;
+	}
+	
+	@PostMapping(path = "/rest/linkclick")
+	public void linkClick(@RequestParam(name = "id") long id, HttpServletRequest request) {
+		log.info("Link with id {} clicked", id);
+		
+		String remoteAddr = "";
+
+        if (request != null) {
+            remoteAddr = request.getHeader("X-FORWARDED-FOR");
+            if (remoteAddr == null || "".equals(remoteAddr)) {
+                remoteAddr = request.getRemoteAddr();
+            }
+        }
+        
+        if(remoteAddr != null && remoteAddr.length() > 0) {
+        	String hashed = Hashing.sha256().hashString(remoteAddr, StandardCharsets.UTF_8).toString();
+        	log.info("IP is {}, hashed {}, length {}", remoteAddr, hashed, hashed.length());
+        	Optional<Feed> feedOptional = feedRepository.findById(id);
+        	if(feedOptional.isPresent()) {
+        		Feed feed = feedOptional.get();
+        		log.info("Add click to feed id {}", feed.getId());
+        		IPHash ipHash = ipHashRepository.findByIpHash(hashed);
+        		if(ipHash == null) {
+        			ipHash = new IPHash(hashed);
+        		}
+        		feed.addIpClick(ipHash);
+        		feedRepository.save(feed);
+        	}
+        }
 	}
 	
 	@GetMapping(path = "/rest/unreadcount")
