@@ -26,8 +26,8 @@ class Content extends React.Component {
 
         this.lastFetchTime= null
         this.timeIndex = 0
-        this.timeGroups = [0, 5, 10, 30, 60, 120]
-        this.timeGroupsBool = [true, true, true, true, true, true]
+        this.timeGroups = [0, 5, 10, 30, 60, 120, 240]
+        this.timeGroupsBool = [true, true, true, true, true, true, true]
         console.log("this.state showDescription " + this.state.showDescription)
         this.getFeeds = this.getFeeds.bind(this);
         this.showHeader = this.showHeader.bind(this);
@@ -41,7 +41,7 @@ class Content extends React.Component {
 
   handleChange = name => event => {
 	this.timeIndex = 0
-	this.timeGroupsBool = [true, true, true, true, true, true]
+	this.timeGroupsBool = [true, true, true, true, true, true, true]
 	this.setState({showDescription: event.target.checked})
     this.cookies.set('showDescription', event.target.checked)
     console.log("event: " + event.target.checked + " ,state showDescription: " + this.state.showDescription + " ,cookie showDescription: " + this.cookies.get('showDescription'))
@@ -63,7 +63,7 @@ class Content extends React.Component {
         url = "/rest/news?category=" + category;
     }
     this.setState({unreadCount: 0})
-    this.timeGroupsBool = [true, true, true, true, true, true]
+    this.timeGroupsBool = [true, true, true, true, true, true, true]
     console.log("Read news from url " + url)
     fetch(url)
         .then(function(response) {
@@ -72,7 +72,7 @@ class Content extends React.Component {
         })
         .then(function(feeds) {
             console.log(feeds.content);
-            content.timeGroupsBool = [true, true, true, true, true, true]
+            content.timeGroupsBool = [true, true, true, true, true, true, true]
             content.setState({ feeds: feeds.content });
         });
 
@@ -94,6 +94,14 @@ class Content extends React.Component {
         return "IT";
     else if(category === 'ENTERTAINMENT')
         return "Viihde";
+    else if(category === 'CARS')
+        return "Autot";
+    else if(category === 'MOTORBIKES')
+        return "Moottoripyörät";
+    else if(category === 'SCIENCE')
+        return "Tiede";
+    else if(category === 'LIFESTYLE')
+        return "Lifestyle";
 
     return "Etusivu"
   }
@@ -103,7 +111,7 @@ class Content extends React.Component {
     this.getData();
     this.getFeeds();
     this.onTopInit();
-    this.timerID = setInterval(() => this.tick(),1000);
+    this.timerID = setInterval(() => this.tick(),5000);
   }
 
   componentWillUnmount() {
@@ -128,7 +136,7 @@ class Content extends React.Component {
       .then(function(count) {
           //console.log("Unread count is " + count + " state unread count " + content.state.unreadCount);
           if(content.state.unreadCount !== parseInt(count)) {
-            content.timeGroupsBool = [true, true, true, true, true, true]
+            content.timeGroupsBool = [true, true, true, true, true, true, true]
             content.setState({unreadCount: parseInt(count)})
           }
       });
@@ -195,9 +203,14 @@ class Content extends React.Component {
     	  return 60
       }
 	  
-	  if(this.timeGroupsBool[5] === true && difference >= this.minToMs(120)) {
+	  if(this.timeGroupsBool[5] === true && difference >= this.minToMs(120) && difference < this.minToMs(240)) {
     	  this.timeGroupsBool[5] = false
     	  return 120
+      }
+	  
+	  if(this.timeGroupsBool[6] === true && difference >= this.minToMs(240)) {
+    	  this.timeGroupsBool[6] = false
+    	  return 240
       }
 	  
       return undefined
@@ -305,3 +318,4 @@ class Content extends React.Component {
 }
 
 export default Content;
+

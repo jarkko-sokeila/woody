@@ -54,7 +54,7 @@ public class FeedController {
 		log.info("f ip: {}, r ip: {}", request.getHeader("X-FORWARDED-FOR"), request.getRemoteAddr());
 		log.info("Load news in page {} and category {}", page, category);
 		
-		Pageable pageable = PageRequest.of(page, 100);
+		Pageable pageable = PageRequest.of(page, 200);
 		Page<Feed> result;
 		if(category == null) {
 			result = feedRepository.findByOrderByPublishedDesc(pageable);

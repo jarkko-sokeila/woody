@@ -68,6 +68,30 @@ class FeedItem extends React.Component {
         source = "Poliisi"
     } else if (source === 'TIVI') {
         source = "Tivi"
+    } else if (source === 'ME_NAISET') {
+    	source = "Me naiset"
+    } else if (source === 'BIKE') {
+    	source = "Bike"
+    } else if (source === 'RADIO_NOVA') {
+    	source = "Radio Nova"
+    } else if (source === 'PELAAJA') {
+    	source = "Pelaaja"
+    } else if (source === 'RAKENNUSLEHTI') {
+    	source = "Rakennuslehti"
+    } else if (source === 'PUHELINVERTAILU') {
+    	source = "Puhelinvertailu"
+    } else if (source === 'MOBIILI') {
+    	source = "Mobiili"
+    } else if (source === 'SOUNDI') {
+    	source = "Soundi"
+    } else if (source === 'MIKROBITTI') {
+    	source = "Mikribitti"
+    } else if (source === 'STARA') {
+    	source = "Stara"
+    } else if (source === 'FINDANCE') {
+    	source = "Findance"
+    } else if (source === 'HYMY') {
+    	source = "Hymy"
     }
     
     if(subCategory != null) {
@@ -148,6 +172,8 @@ class FeedItem extends React.Component {
 		return '1 TUNTI'
 	else if(this.props.showHeader === 120)
 		return '2 TUNTIA'
+	else if(this.props.showHeader === 240)
+		return '4 TUNTIA'
 	else
 		return this.props.showHeader + ' MIN'	  
   }

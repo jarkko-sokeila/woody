@@ -20,6 +20,10 @@ class App extends React.Component {
 	    this.Sports = this.Sports.bind(this);
 	    this.IT = this.IT.bind(this);
 	    this.Entertainment = this.Entertainment.bind(this);
+	    this.Cars = this.Cars.bind(this);
+	    this.Motorbikes = this.Motorbikes.bind(this);
+	    this.Science = this.Science.bind(this);
+	    this.Lifestyle = this.Lifestyle.bind(this);
 	    this.toggleMenu = this.toggleMenu.bind(this);
 	}
 	
@@ -58,6 +62,22 @@ class App extends React.Component {
 	  return <Content category="ENTERTAINMENT" onToggle={this.toggleMenu} />;
 	}
 	
+	Cars() {
+	  return <Content category="CARS" onToggle={this.toggleMenu} />;
+	}
+	
+	Motorbikes() {
+	  return <Content category="MOTORBIKES" onToggle={this.toggleMenu} />;
+	}
+	
+	Science() {
+	  return <Content category="SCIENCE" onToggle={this.toggleMenu} />;
+	}
+	
+	Lifestyle() {
+	  return <Content category="LIFESTYLE" onToggle={this.toggleMenu} />;
+	}
+	
 render() {
   return (
       <Router>
@@ -65,11 +85,16 @@ render() {
         	<div ref={this.overlay} onClick={this.toggleMenu} id="overlay"></div>
             <Navigation ref={this.nav} onInit={this.setIsMenuOpen} />
 
+            /*If new category url is added, remember add it also in UrlController*/
             <Route exact path="/" component={this.Home} />
             <Route path="/news" component={this.News} />
             <Route path="/sports" component={this.Sports} />
             <Route path="/it" component={this.IT} />
             <Route path="/entertainment" component={this.Entertainment} />
+            <Route path="/cars" component={this.Cars} />
+            <Route path="/motorbikes" component={this.Motorbikes} />
+            <Route path="/science" component={this.Science} />
+            <Route path="/lifestyle" component={this.Lifestyle} />
         </div>
       </Router>
   );
@@ -79,3 +104,4 @@ render() {
 
 
 export default App;
+

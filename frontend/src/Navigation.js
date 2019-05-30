@@ -40,6 +40,10 @@ class Navigation extends React.Component {
             <Button text="Urheilu" link="/sports"selectedCategory={this.state.selectedCategory} onCategoryChanged={this.categorySelected} />
             <Button text="IT" link="/it" selectedCategory={this.state.selectedCategory} onCategoryChanged={this.categorySelected} />
             <Button text="Viihde" link="/entertainment" selectedCategory={this.state.selectedCategory} onCategoryChanged={this.categorySelected} />
+            <Button text="Autot" link="/cars" selectedCategory={this.state.selectedCategory} onCategoryChanged={this.categorySelected} />
+            <Button text="Moottoripyörät" link="/motorbikes" selectedCategory={this.state.selectedCategory} onCategoryChanged={this.categorySelected} />
+            <Button text="Tiede" link="/science" selectedCategory={this.state.selectedCategory} onCategoryChanged={this.categorySelected} />
+            <Button text="Lifestyle" link="/lifestyle" selectedCategory={this.state.selectedCategory} onCategoryChanged={this.categorySelected} />
             {/*<div onClick={this.toggle}>toggle</div>*/}
             {/*<SplitButton/>*/}
 
@@ -57,3 +61,4 @@ class Navigation extends React.Component {
 }
 
 export default Navigation;
+

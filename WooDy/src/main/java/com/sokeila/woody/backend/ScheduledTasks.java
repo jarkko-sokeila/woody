@@ -97,7 +97,7 @@ public class ScheduledTasks {
 			}
         }  catch (Exception e) {
             log.debug("Error while reading rss source", e);
-            log.debug("Url trying to read was {}", url);
+            log.info("Url trying to read was {}", url);
         }
 	}
 
@@ -131,6 +131,9 @@ public class ScheduledTasks {
 		description = description.replace("&#8211;", "-");
 		description = description.replace("&#8230;", "...");
 		description = description.replace("&#8217;", "’");
+		description = description.replace("&#228;", "ä");
+		description = description.replace("&#246;", "ö");
+		
 		
 		if(description.length() > 4096) {
 			log.info("description length {}", description.length());
@@ -160,7 +163,7 @@ public class ScheduledTasks {
 			}
 		}
 		
-		if(categoryData == null) {
+		if(categoryData == null && entry.getCategories().size() > 0) {
 			log.info("Could not resolve category for title {}. \nCategories in feed are \n{}", entry.getTitle(), collectGategories(entry.getCategories()));
 		}
 		
@@ -188,39 +191,39 @@ public class ScheduledTasks {
 	private Collection<String> collectGategories(List<SyndCategory> categories) {
 		Collection<String> result = new ArrayList<>();
 		for(SyndCategory sc: categories) {
-			result.add(sc.getName() + "\n");
+			result.add(sc.getName().trim() + "\n");
 		}
 		return result;
 	}
 
 	private CategoryData resolveCategoryData(SyndCategory syndCategory) {
-		String categoryName = syndCategory.getName();
+		String categoryName = syndCategory.getName().trim();
 		//Resolve NEWS sub categories
-		if(categoryBelongs(categoryName, null, new Compare("Uutiset"))) {
+		if(categoryBelongs(categoryName, null, new Compare("Uutiset", "Uutinen"))) {
 			return new CategoryData(Category.NEWS, null);
-		} else if(categoryBelongs(categoryName, null, new Compare("Kotimaa", "Kotimaan uutiset", "Päijät-Häme", "Turun seutu", "Keskusta nyt", "Oulun seutu", "Tampereen seutu", "Vantaa", "Kaupunki"))) {
+		} else if(categoryBelongs(categoryName, null, new Compare("Kotimaa", "Kotimaan uutiset", "Päijät-Häme", "Turun seutu", "Keskusta nyt", "Oulun seutu", "Tampereen seutu", "Vantaa", "Kaupunki", "Oulu", "Tuusula"))) {
 			return new CategoryData(Category.NEWS, SubCategory.HOMELAND);
 		} else if(categoryBelongs(categoryName, null, new Compare("Ulkomaa", "Ulkomaat"))) {
 			return new CategoryData(Category.NEWS, SubCategory.ABROAD);
 		} else if(categoryBelongs(categoryName, null, new Compare("Tiede"))) {
 			return new CategoryData(Category.NEWS, SubCategory.SCIENCE);
-		} else if(categoryBelongs(categoryName, null, new Compare("Talous", "Taloussanomat", "Pörssiuutiset", "Sijoittaminen", "Kauppa", "Kansantalous", "Yrittäminen", "tyoelama"))) {
+		} else if(categoryBelongs(categoryName, null, new Compare("Talous", "Taloussanomat", "Pörssiuutiset", "Sijoittaminen", "Kauppa", "Kansantalous", "Yrittäminen", "tyoelama", "Työelämä"))) {
 			return new CategoryData(Category.NEWS, SubCategory.ECONOMY);
 		} else if(categoryBelongs(categoryName, null, new Compare("Politiikka"))) {
 			return new CategoryData(Category.NEWS, SubCategory.POLITICS);
 		}
 		
 		//Resolve ENTERTAINMENT sub categories
-		else if(categoryBelongs(categoryName, null, new Compare("Viihde"))) {
+		else if(categoryBelongs(categoryName, null, new Compare("Viihde", "Kulttuuri", "Ajanviete", "Viihdeuutiset"))) {
 			return new CategoryData(Category.ENTERTAINMENT, null);
-		} else if(categoryBelongs(categoryName, null, new Compare("Musiikki"))) {
+		} else if(categoryBelongs(categoryName, null, new Compare("Musiikki", "uutiset - musiikki"))) {
 			return new CategoryData(Category.ENTERTAINMENT, SubCategory.MUSIC);
-		} else if(categoryBelongs(categoryName, null, new Compare("Elokuvat"))) {
+		} else if(categoryBelongs(categoryName, null, new Compare("Elokuvat", "TV & elokuvat", "uutiset - elokuvat", "uutiset - tv"))) {
 			return new CategoryData(Category.ENTERTAINMENT, SubCategory.MOVIES);
 		}
 		
 		//Resolve SPORTS sub categories
-		else if(categoryBelongs(categoryName, null, new Compare("Urheilu"))) {
+		else if(categoryBelongs(categoryName, null, new Compare("Urheilu", "Sport"))) {
 			return new CategoryData(Category.SPORTS, null);
 		} else if(categoryBelongs(categoryName, new Compare("kiekko"), new Compare("NHL", "Liiga", "SM-liiga", "smliiga", "KHL"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.ICE_HOCKEY);
@@ -240,7 +243,7 @@ public class ScheduledTasks {
 			return new CategoryData(Category.SPORTS, SubCategory.HARNESS_RACING);
 		} else if(categoryBelongs(categoryName, null, new Compare("Nyrkkeily", "kamppailulajit"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.MARTIAL_ARTS);
-		} else if(categoryBelongs(categoryName, null, new Compare("talviurheilu"))) {
+		} else if(categoryBelongs(categoryName, null, new Compare("talviurheilu", "Alppihiihto"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.WINTER_SPORTS);
 		} else if(categoryBelongs(categoryName, null, new Compare("Esports"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.E_SPORTS);
@@ -254,13 +257,33 @@ public class ScheduledTasks {
 			return new CategoryData(Category.SPORTS, SubCategory.MOTORBIKES);
 		} else if(categoryBelongs(categoryName, null, new Compare("Pesäpallo"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.BASEBALL);
-		} else if(categoryBelongs(categoryName, null, new Compare("muutlajit", "fitnessvoimailu", "Muut lajit"))) {
+		} else if(categoryBelongs(categoryName, null, new Compare("muutlajit", "fitnessvoimailu", "Muut lajit", "Muut sarjat"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.OTHER_SPORTS);
 		}
 		
 		//Resolve IT sub categories
-		else if(categoryBelongs(categoryName, null, new Compare("Tietotekniikka", "Mobiili", "Pelit", "Digitalous", "Android", "Teknologia", "Digitoday", "Tietoturva"))) {
+		else if(categoryBelongs(categoryName, null, new Compare("Tietotekniikka", "Mobiili", "Pelit", "Digitalous", "Android", "Teknologia", "Digitoday", "Tietoturva", "Älypuhelimet", "Tekoäly", "ECF", "Tekniset artikkelit", "Virtuaalitodellisuus"))) {
 			return new CategoryData(Category.IT, null);
+		}
+		
+		//Resolve CARS sub categories
+		else if(categoryBelongs(categoryName, null, new Compare("Autot", "Auto"))) {
+			return new CategoryData(Category.CARS, null);
+		}
+		
+		//Resolve MOTORBIKES sub categories
+		else if(categoryBelongs(categoryName, null, new Compare("Moottoripyörä", "Road Racing"))) {
+			return new CategoryData(Category.MOTORBIKES, null);
+		}
+		
+		//Resolve SCIENCE sub categories
+		else if(categoryBelongs(categoryName, null, new Compare("Tähdet", "Avaruus"))) {
+			return new CategoryData(Category.SCIENCE, null);
+		}
+		
+		//Resolve LIFESTYLE sub categories
+		else if(categoryBelongs(categoryName, null, new Compare("Blogit", "Me Naiset", "Asuminen", "MyStyle", "Laihdutus", "Meidän Perhe", "Soppa365", "Kodin Kuvalehti", "Hyvä terveys", "Gloria", "Matkailu", "Lifestyle"))) {
+			return new CategoryData(Category.LIFESTYLE, null);
 		}
 		
 		return null;
