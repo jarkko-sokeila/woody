@@ -85,7 +85,7 @@ render() {
         	<div ref={this.overlay} onClick={this.toggleMenu} id="overlay"></div>
             <Navigation ref={this.nav} onInit={this.setIsMenuOpen} />
 
-            /*If new category url is added, remember add it also in UrlController*/
+            {/*If new category url is added, remember add it also in UrlController*/}
             <Route exact path="/" component={this.Home} />
             <Route path="/news" component={this.News} />
             <Route path="/sports" component={this.Sports} />
