@@ -154,6 +154,10 @@ class FeedItem extends React.Component {
         return 'Elokuvat'
       }
 
+      else if(subCategory === 'MOBILE') {
+        return 'Mobiili'
+      }
+
 
       return subCategory
   }

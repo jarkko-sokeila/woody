@@ -39,7 +39,7 @@ class Content extends React.Component {
         this.tick = this.tick.bind(this);
   }
 
-  handleChange = name => event => {
+  handleShowDescriptionToggle = name => event => {
 	this.timeIndex = 0
 	this.timeGroupsBool = [true, true, true, true, true, true, true]
 	this.setState({showDescription: event.target.checked})
@@ -216,28 +216,6 @@ class Content extends React.Component {
       return undefined
   }
   
-  /*showHeader(item) {
-      //console.log("test loop value " + this.test)
-	  var currentDate = new Date()
-	  var published = new Date(item.published)
-	  var difference = (currentDate.getTime() - published.getTime())
-	  console.log("current date: " + currentDate.toLocaleString() + " ,published: " + published.toLocaleString() + " ,difference: " + difference)
-	  
-      if(this.timeIndex === 0) {
-        this.timeIndex++
-        return 0
-      }
-    
-	  console.log("Test timegroup with index " + this.timeIndex)
-      if(this.timeIndex < this.timeGroups.length && this.checkTimeDifference(this.timeGroups[this.timeIndex], difference)) {
-    	  var header = this.timeGroups[this.timeIndex]
-    	  this.timeIndex++
-    	  return header
-      }
-	  
-      return undefined
-  }*/
-  
   minToMs(min) {
 	  return min * 60 * 1000
   }
@@ -265,7 +243,7 @@ class Content extends React.Component {
                 <div className="header-title">
                 	<FontAwesomeIcon icon={faBars} onClick={this.toggleMenu} id="menuBtn" />
                 	<span>{this.getHeaderTitle()}</span>
-                </div> {/* News, {this.state.data}*/}
+                </div>
                 {this.state.unreadCount > 0 ?
                     <div className="header-refresh" onClick={this.refresh}>
                         <Badge className="refresh-badge" badgeContent={this.state.unreadCount} color="secondary">
@@ -275,25 +253,13 @@ class Content extends React.Component {
                     </div>
                     : <div className="refresh-empty"></div>
                 }
-                {/*
-                <div className="description">
-                	<FormControlLabel
-		                control={
-		                    <Switch checked={this.state.showDescription}
-		                        onChange={this.handleChange('showDescription')}
-		                        value="showDescription" />
-		                 }
-		                 label="Esikatselu"
-                	 />
-                </div>
-                */}
                 <div className="menu">
                     <FontAwesomeIcon className="menu-icon" icon={faCog} />
                     <div className="menu-content">
                         <FormControlLabel
                             control={
                                 <Switch checked={this.state.showDescription}
-                                    onChange={this.handleChange('showDescription')}
+                                    onChange={this.handleShowDescriptionToggle('showDescription')}
                                     value="showDescription" />
                             }
                             label="Esikatselu"
@@ -302,9 +268,8 @@ class Content extends React.Component {
                 </div>
             </div>
             <div className="content">
-                {this.state.feeds.length ?
-                    this.state.feeds.map(this.renderFeedItems) 
-                    : <span>Loading...</span>
+                {this.state.feeds.length ? this.state.feeds.map(this.renderFeedItems)
+                     : <span>Loading...</span>
                 }
             </div>
             <footer className="footer">

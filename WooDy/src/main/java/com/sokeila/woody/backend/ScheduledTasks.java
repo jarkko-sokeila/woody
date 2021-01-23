@@ -1,18 +1,15 @@
 package com.sokeila.woody.backend;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.net.ssl.SSLContext;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,44 +32,19 @@ public class ScheduledTasks {
 
     private static final Logger log = LoggerFactory.getLogger(ScheduledTasks.class);
 
-    //private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-
     @Autowired
     private FeedRepository feedRepository;
     
     @Scheduled(fixedRate = 5000)
     public void readRSSFeeds() {
-        //log.info("The time is now {}", dateFormat.format(new Date()));
-        readFeeds();
-    }
-
-	private void readFeeds() {
 		for(RssSource rssSource: RssSource.values()) {
 			parseRss(rssSource, Category.NEWS, RssSource::getNewsSource);
 			parseRss(rssSource, Category.SPORTS, RssSource::getSportsSource);
 			parseRss(rssSource, Category.IT, RssSource::getItSource);
 		}
-		
-		/*try {
-            String url = "https://www.iltalehti.fi/rss/uutiset.xml";
-            String url2 = "https://www.is.fi/rss/kotimaa.xml";
- 
-            try (XmlReader reader = new XmlReader(new URL(url2))) {
-                SyndFeed feed = new SyndFeedInput().build(reader);
-                System.out.println(feed.getTitle());
-                System.out.println("***********************************");
-                for (SyndEntry entry : feed.getEntries()) {
-                    System.out.println(entry);
-                    System.out.println("***********************************");
-                }
-                System.out.println("Done");
-            }
-        }  catch (Exception e) {
-            e.printStackTrace();
-        }*/
-	}
+    }
 
-	private void parseRss(RssSource rssSource, Category category, Function<RssSource, String> urlFunction) {
+	private void parseRss(RssSource rssSource, Category defaultCategory, Function<RssSource, String> urlFunction) {
 		String url = urlFunction.apply(rssSource);
 		
 		try {
@@ -86,9 +58,9 @@ public class ScheduledTasks {
 	                log.debug(feed.getTitle());
 	                log.debug("***********************************");
 	                for (SyndEntry entry : feed.getEntries()) {
-	                	if(!feedExists(entry)) {
-	                    	createNewFeed(entry, rssSource, category);
-	                    	log.debug("{}", entry);
+	                	if(entry != null && !feedExists(entry)) {
+							log.debug("{}", entry);
+	                    	createNewFeed(entry, rssSource, defaultCategory);
 	                    	log.debug("***********************************");
 	                    }
 	                }
@@ -97,11 +69,11 @@ public class ScheduledTasks {
 			}
         }  catch (Exception e) {
             log.debug("Error while reading rss source", e);
-            log.info("Url trying to read was {}", url);
+            log.warn("Url trying to read was {}", url);
         }
 	}
 
-	private void createNewFeed(SyndEntry entry, RssSource rssSource, Category category) {
+	private void createNewFeed(SyndEntry entry, RssSource rssSource, Category defaultCategory) {
 		Feed entity = new Feed();
 		
 		CategoryData categoryData = resolveCategoryData(entry);
@@ -113,7 +85,7 @@ public class ScheduledTasks {
 		entity.setGuid(entry.getUri());
 		entity.setLink(entry.getLink());
 		entity.setPublished(entry.getPublishedDate().after(now) ? now: entry.getPublishedDate());
-		entity.setCategory(categoryData != null ? categoryData.getCategory(): category);
+		entity.setCategory(categoryData != null ? categoryData.getCategory(): defaultCategory);
 		entity.setSubCategory(categoryData != null ? categoryData.getSubCategory() : null);
 		entity.setCreated(now);
 		
@@ -133,13 +105,12 @@ public class ScheduledTasks {
 		description = description.replace("&#8217;", "’");
 		description = description.replace("&#228;", "ä");
 		description = description.replace("&#246;", "ö");
-		
-		
+
 		if(description.length() > 4096) {
-			log.info("description length {}", description.length());
+			log.debug("description length {}", description.length());
 			description = description.substring(0, 4092) + "...";
-			log.info("description length {}", description.length());
-			log.info("description {}", description);
+			log.debug("description length {}", description.length());
+			log.debug("description {}", description);
 		}
 		
 		return description;
@@ -147,56 +118,41 @@ public class ScheduledTasks {
 
 	private CategoryData resolveCategoryData(SyndEntry entry) {
 		CategoryData categoryData = null;
-		if(entry.getCategories().size() == 1) {
-			categoryData = resolveCategoryData(entry.getCategories().get(0));
+		List<SyndCategory> syndCategories = entry.getCategories();
+		if(syndCategories.size() == 1) {
+			categoryData = resolveCategoryData(syndCategories.get(0));
 		} else {
-			Set<CategoryData> subCategorySet = new HashSet<>();
-			for(SyndCategory syndCategory: entry.getCategories()) {
+			Set<CategoryData> categorySet = new HashSet<>();
+			syndCategories = filterGeneralCategories(syndCategories);
+			for(SyndCategory syndCategory: syndCategories) {
 				CategoryData temp = resolveCategoryData(syndCategory);
 				if(temp != null) {
-					subCategorySet.add(temp);
+					categorySet.add(temp);
 				}
 			}
 			
-			if(subCategorySet.size() == 1 || (subCategorySet.size() > 1 && onlySingleSubCategory(subCategorySet))) {
-				categoryData = subCategorySet.iterator().next();
+			if(categorySet.size() == 1) {
+				categoryData = categorySet.iterator().next();
 			}
 		}
 		
-		if(categoryData == null && entry.getCategories().size() > 0) {
-			log.info("Could not resolve category for title {}. \nCategories in feed are \n{}", entry.getTitle(), collectGategories(entry.getCategories()));
+		if(categoryData == null && syndCategories.size() > 0) {
+			Collection<String> categories = syndCategories.stream().map(SyndCategory::getName).filter(Objects::nonNull).collect(Collectors.toList());
+			log.warn("Could not resolve category for title {}. \nCategories in feed are: {}", entry.getTitle(), categories);
 		}
 		
 		return categoryData;
 	}
 
-	private boolean onlySingleSubCategory(Set<CategoryData> subCategorySet) {
-		SubCategory subCategory = null;
-		boolean first = true;
-		for(CategoryData cd: subCategorySet) {
-			if(cd.getSubCategory() != null) {
-				if(first == true) {
-					subCategory = cd.getSubCategory();
-					first = false;
-				} else {
-					if(cd.getSubCategory() != subCategory) {
-						return false;
-					}
-				}
-			}
-		}
-		return true;
-	}
-
-	private Collection<String> collectGategories(List<SyndCategory> categories) {
-		Collection<String> result = new ArrayList<>();
-		for(SyndCategory sc: categories) {
-			result.add(sc.getName().trim() + "\n");
-		}
-		return result;
+	private List<SyndCategory> filterGeneralCategories(List<SyndCategory> syndCategories) {
+    	Compare generalCompare = new Compare("Uutiset", "Uutinen");
+    	return syndCategories.stream().filter(syndCategory -> !categoryBelongs(syndCategory.getName().trim(), null, generalCompare)).collect(Collectors.toList());
 	}
 
 	private CategoryData resolveCategoryData(SyndCategory syndCategory) {
+    	if(StringUtils.isBlank(syndCategory.getName()))
+    		return null;
+
 		String categoryName = syndCategory.getName().trim();
 		//Resolve NEWS sub categories
 		if(categoryBelongs(categoryName, null, new Compare("Uutiset", "Uutinen"))) {
@@ -207,18 +163,18 @@ public class ScheduledTasks {
 			return new CategoryData(Category.NEWS, SubCategory.ABROAD);
 		} else if(categoryBelongs(categoryName, null, new Compare("Tiede"))) {
 			return new CategoryData(Category.NEWS, SubCategory.SCIENCE);
-		} else if(categoryBelongs(categoryName, null, new Compare("Talous", "Taloussanomat", "Pörssiuutiset", "Sijoittaminen", "Kauppa", "Kansantalous", "Yrittäminen", "tyoelama", "Työelämä"))) {
+		} else if(categoryBelongs(categoryName, null, new Compare("Talous", "Taloussanomat", "Pörssiuutiset", "Sijoittaminen", "Kauppa", "Kansantalous", "Yrittäminen", "tyoelama", "Työelämä", "Asunnot", "asuntokauppa", "Rakentaminen", "Kiinteistöt", "Suunnittelu", "Yhteiskunta"))) {
 			return new CategoryData(Category.NEWS, SubCategory.ECONOMY);
 		} else if(categoryBelongs(categoryName, null, new Compare("Politiikka"))) {
 			return new CategoryData(Category.NEWS, SubCategory.POLITICS);
 		}
 		
 		//Resolve ENTERTAINMENT sub categories
-		else if(categoryBelongs(categoryName, null, new Compare("Viihde", "Kulttuuri", "Ajanviete", "Viihdeuutiset"))) {
+		else if(categoryBelongs(categoryName, null, new Compare("Viihde", "Kulttuuri", "Ajanviete", "Viihdeuutiset", "uutiset - viihde"))) {
 			return new CategoryData(Category.ENTERTAINMENT, null);
 		} else if(categoryBelongs(categoryName, null, new Compare("Musiikki", "uutiset - musiikki"))) {
 			return new CategoryData(Category.ENTERTAINMENT, SubCategory.MUSIC);
-		} else if(categoryBelongs(categoryName, null, new Compare("Elokuvat", "TV & elokuvat", "uutiset - elokuvat", "uutiset - tv"))) {
+		} else if(categoryBelongs(categoryName, null, new Compare("Elokuvat", "TV & elokuvat", "uutiset - elokuvat", "uutiset - tv", "Elokuvauutiset", "Netflix", "HBO Nordic"))) {
 			return new CategoryData(Category.ENTERTAINMENT, SubCategory.MOVIES);
 		}
 		
@@ -233,7 +189,7 @@ public class ScheduledTasks {
 			return new CategoryData(Category.SPORTS, SubCategory.ATHLEITCS);
 		} else if(categoryBelongs(categoryName, null, new Compare("Formula 1", "formulat"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.FORMULA1);
-		} else if(categoryBelongs(categoryName, null, new Compare("Ralli"))) {
+		} else if(categoryBelongs(categoryName, null, new Compare("Ralli", "Rallin MM-sarja", "ralliautoilu", "moottoriurheilu"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.RALLY);
 		} else if(categoryBelongs(categoryName, null, new Compare("Salibandy"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.FLOORBALL);
@@ -243,13 +199,13 @@ public class ScheduledTasks {
 			return new CategoryData(Category.SPORTS, SubCategory.HARNESS_RACING);
 		} else if(categoryBelongs(categoryName, null, new Compare("Nyrkkeily", "kamppailulajit"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.MARTIAL_ARTS);
-		} else if(categoryBelongs(categoryName, null, new Compare("talviurheilu", "Alppihiihto"))) {
+		} else if(categoryBelongs(categoryName, null, new Compare("talviurheilu", "Alppihiihto", "Maastohiihto", "Hiihtolajit", "Ampumahiihto", "mäkihyppy"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.WINTER_SPORTS);
 		} else if(categoryBelongs(categoryName, null, new Compare("Esports"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.E_SPORTS);
 		} else if(categoryBelongs(categoryName, null, new Compare("Golf"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.GOLF);
-		} else if(categoryBelongs(categoryName, null, new Compare("Tennis"))) {
+		} else if(categoryBelongs(categoryName, null, new Compare("Tennis", "tennis"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.TENNIS);
 		} else if(categoryBelongs(categoryName, null, new Compare("Lentopallo"))) {
 			return new CategoryData(Category.SPORTS, SubCategory.VOLLEY_BALL);
@@ -262,8 +218,10 @@ public class ScheduledTasks {
 		}
 		
 		//Resolve IT sub categories
-		else if(categoryBelongs(categoryName, null, new Compare("Tietotekniikka", "Mobiili", "Pelit", "Digitalous", "Android", "Teknologia", "Digitoday", "Tietoturva", "Älypuhelimet", "Tekoäly", "ECF", "Tekniset artikkelit", "Virtuaalitodellisuus"))) {
+		else if(categoryBelongs(categoryName, null, new Compare("Tietokoneet", "Tietotekniikka", "Pelit", "Digitalous", "Teknologia", "Digitoday", "Tietoturva", "Tekoäly", "ECF", "Tekniset artikkelit", "Virtuaalitodellisuus", "Digi", "Bitcoin", "Iot"))) {
 			return new CategoryData(Category.IT, null);
+		} else if(categoryBelongs(categoryName, null, new Compare("Oppo", "5G", "Honor", "puhelin", "Android", "Mobiili", "Älypuhelimet"))) {
+			return new CategoryData(Category.IT, SubCategory.MOBILE);
 		}
 		
 		//Resolve CARS sub categories
@@ -282,7 +240,7 @@ public class ScheduledTasks {
 		}
 		
 		//Resolve LIFESTYLE sub categories
-		else if(categoryBelongs(categoryName, null, new Compare("Blogit", "Me Naiset", "Asuminen", "MyStyle", "Laihdutus", "Meidän Perhe", "Soppa365", "Kodin Kuvalehti", "Hyvä terveys", "Gloria", "Matkailu", "Lifestyle"))) {
+		else if(categoryBelongs(categoryName, null, new Compare("Blogit", "Me Naiset", "Asuminen", "MyStyle", "Laihdutus", "Meidän Perhe", "Soppa365", "Kodin Kuvalehti", "Hyvä terveys", "Gloria", "Matkailu", "Lifestyle", "Matkat", "Tyyli"))) {
 			return new CategoryData(Category.LIFESTYLE, null);
 		}
 		
@@ -307,16 +265,12 @@ public class ScheduledTasks {
 	}
 
 	private boolean feedExists(SyndEntry entry) {
-		if(feedRepository.existsByGuid(entry.getUri())) {
-			return true;
-		}
-		
-		return false;
+		return feedRepository.existsByGuid(entry.getUri());
 	}
 	
 	private static class CategoryData {
-		private Category category;
-		private SubCategory subCategory;
+		private final Category category;
+		private final SubCategory subCategory;
 		
 		public CategoryData(Category category, SubCategory subCategory) {
 			this.category = category;
@@ -329,10 +283,26 @@ public class ScheduledTasks {
 		public SubCategory getSubCategory() {
 			return subCategory;
 		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+
+			if (!(o instanceof CategoryData)) return false;
+
+			CategoryData that = (CategoryData) o;
+
+			return new EqualsBuilder().append(getCategory(), that.getCategory()).append(getSubCategory(), that.getSubCategory()).isEquals();
+		}
+
+		@Override
+		public int hashCode() {
+			return new HashCodeBuilder(17, 37).append(getCategory()).append(getSubCategory()).toHashCode();
+		}
 	}
 	
 	private static class Compare {
-		private Collection<String> categoryNames;
+		private final Collection<String> categoryNames;
 		
 		public Compare(String... values) {
 			categoryNames = Arrays.asList(values);

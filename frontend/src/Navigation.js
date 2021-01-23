@@ -36,25 +36,14 @@ class Navigation extends React.Component {
         <div ref={this.nav} className="navigation">
             <div className="nav-header"><a href="/"><p>WooDy</p></a></div>
             <Button text="Etusivu" link="/" selectedCategory={this.state.selectedCategory} onCategoryChanged={this.categorySelected} />
-            <Button text="Uutiset" link="/news"selectedCategory={this.state.selectedCategory} onCategoryChanged={this.categorySelected} />
-            <Button text="Urheilu" link="/sports"selectedCategory={this.state.selectedCategory} onCategoryChanged={this.categorySelected} />
+            <Button text="Uutiset" link="/news" selectedCategory={this.state.selectedCategory} onCategoryChanged={this.categorySelected} />
+            <Button text="Urheilu" link="/sports" selectedCategory={this.state.selectedCategory} onCategoryChanged={this.categorySelected} />
             <Button text="IT" link="/it" selectedCategory={this.state.selectedCategory} onCategoryChanged={this.categorySelected} />
             <Button text="Viihde" link="/entertainment" selectedCategory={this.state.selectedCategory} onCategoryChanged={this.categorySelected} />
             <Button text="Autot" link="/cars" selectedCategory={this.state.selectedCategory} onCategoryChanged={this.categorySelected} />
             <Button text="Moottoripyörät" link="/motorbikes" selectedCategory={this.state.selectedCategory} onCategoryChanged={this.categorySelected} />
             <Button text="Tiede" link="/science" selectedCategory={this.state.selectedCategory} onCategoryChanged={this.categorySelected} />
             <Button text="Lifestyle" link="/lifestyle" selectedCategory={this.state.selectedCategory} onCategoryChanged={this.categorySelected} />
-            {/*<div onClick={this.toggle}>toggle</div>*/}
-            {/*<SplitButton/>*/}
-
-            
-            {/*<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
-                <input type="hidden" name="cmd" value="_donations" />
-                <input type="hidden" name="business" value="jarkko.sokeila@gmail.com" />
-                <input type="hidden" name="currency_code" value="EUR" />
-                <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
-                <img alt="" border="0" src="https://www.paypal.com/en_FI/i/scr/pixel.gif" width="1" height="1" />
-            </form>*/}
         </div>
     );
   }

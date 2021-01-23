@@ -11,13 +11,11 @@ class Button extends React.Component {
 	  console.log("selectedCategory: " + this.props.selectedCategory + ",text: " + this.props.text + " ,classes:" + classes)
 	  
     return (
-    	
         <a href={this.props.link} >
             <div className={classes} onClick={this.handleClick}>
                 <span>{this.props.text}</span>
             </div>
         </a>
-        
     );
   }
 

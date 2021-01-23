@@ -8,6 +8,10 @@ repositories {
     mavenCentral()
 }
 
+task installDependencies(type: NpmTask) {
+    args = ['install']
+}
+
 task buildFrontend(type: NpmTask) {
     args = ['run', 'build']
 }
@@ -20,5 +24,6 @@ task start(type: NpmTask) {
     args = ['run', 'start']
 }
 
-buildFrontend.dependsOn(npmSetup)
+installDependencies.dependsOn(npmSetup)
+buildFrontend.dependsOn(installDependencies)
 assemble.dependsOn(buildFrontend)
