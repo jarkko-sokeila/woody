@@ -20,3 +20,11 @@
    desired location e.g. /opt/woody
 3. Start application `java -jar WooDy.jar`
 4. Open your browser on http://localhost:8080
+
+## Jenkins build setup
+***!Note, Jenkinsfile supports currently only linux***
+
+1. Create new pipeline Item
+2. Configure pPipeline section. Select `Pipeline script from SCM`
+3. Configure Git repository location
+4. Configure script path: `Jenkisfile`
