@@ -20,6 +20,7 @@ pipeline {
                 script {
                     sh './gradlew test'
                 }
+                junit 'WooDy/build/test-results/test/**/*.xml'
             }
         }
         stage('Report') {

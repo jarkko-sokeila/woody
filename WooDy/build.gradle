@@ -19,11 +19,18 @@ dependencies {
     implementation 'com.google.guava:guava:30.1-jre'
     implementation 'org.apache.commons:commons-lang3:3.10'
 
-    testImplementation 'junit:junit'
+    // Test
+    testImplementation('org.springframework.boot:spring-boot-starter-test:2.3.1.RELEASE') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
 }
 
 bootJar {
     from('../frontend/build') {
         into 'static'
     }
+}
+
+test {
+    useJUnitPlatform()
 }
