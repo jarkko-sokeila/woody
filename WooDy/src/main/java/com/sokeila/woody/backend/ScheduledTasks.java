@@ -2,11 +2,14 @@ package com.sokeila.woody.backend;
 
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.net.ssl.SSLContext;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -34,6 +37,10 @@ public class ScheduledTasks {
 
     @Autowired
     private FeedRepository feedRepository;
+
+    private static Cache<String, Boolean> cache = CacheBuilder.newBuilder()
+			.expireAfterWrite(6, TimeUnit.HOURS)
+			.build();
     
     @Scheduled(fixedRate = 5000)
     public void readRSSFeeds() {
@@ -57,19 +64,28 @@ public class ScheduledTasks {
 	                
 	                log.debug(feed.getTitle());
 	                log.debug("***********************************");
+	                int newCount = 0;
 	                for (SyndEntry entry : feed.getEntries()) {
 	                	if(entry != null && !feedExists(entry)) {
 							log.debug("{}", entry);
 	                    	createNewFeed(entry, rssSource, defaultCategory);
+							newCount++;
 	                    	log.debug("***********************************");
 	                    }
 	                }
+	                if(newCount > 0) {
+	                	log.info("Created {} new feeds from ur {}", newCount, url);
+					}
 	                log.debug("Done");
 	            }
 			}
         }  catch (Exception e) {
             log.debug("Error while reading rss source", e);
-            log.warn("Url trying to read was {}", url);
+			Boolean hasValue = cache.getIfPresent(url);
+			if(hasValue == null || !hasValue) {
+				cache.put(url, true);
+				log.warn("Url trying to read was {}", url);
+			}
         }
 	}
 
@@ -138,7 +154,7 @@ public class ScheduledTasks {
 		
 		if(categoryData == null && syndCategories.size() > 0) {
 			Collection<String> categories = syndCategories.stream().map(SyndCategory::getName).filter(Objects::nonNull).collect(Collectors.toList());
-			log.warn("Could not resolve category for title {}. \nCategories in feed are: {}", entry.getTitle(), categories);
+			log.info("Could not resolve category for title {}. \nCategories in feed are: {}", entry.getTitle(), categories);
 		}
 		
 		return categoryData;

@@ -19,10 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.google.common.hash.Hashing;
 import com.sokeila.woody.backend.entity.Category;
@@ -33,6 +30,7 @@ import com.sokeila.woody.backend.services.FeedRepository;
 import com.sokeila.woody.backend.services.IPHashRepository;
 
 @RestController
+@RequestMapping("/rest")
 public class FeedController {
 	private static final Logger log = LoggerFactory.getLogger(FeedController.class);
 	
@@ -45,7 +43,7 @@ public class FeedController {
 	@Autowired
     private IPHashRepository ipHashRepository;
 	
-	@GetMapping(path = "/rest/news")
+	@GetMapping(path = "/news")
 	public Page<Feed> news(@RequestParam(name = "page", required = false) Integer page, @RequestParam(name = "category", required = false) Category category, HttpServletRequest request) {
 		if(page == null) {
 			page = 0;
@@ -70,13 +68,11 @@ public class FeedController {
 		return result;
 	}
 	
-	@GetMapping(path = "/rest/getfeed")
+	@GetMapping(path = "/getfeed")
 	public Feed getFeed(@RequestParam(name = "id") long id) {
-
 		log.info("Find feed with id {}", id);
 
 		Optional<Feed> feedOpt = feedRepository.findById(id);
-
 		if(feedOpt.isPresent()) {
 			Feed result = feedOpt.get();
 			result.resolveClickCount();
@@ -88,12 +84,11 @@ public class FeedController {
 		return null;
 	}
 	
-	@PostMapping(path = "/rest/linkclick")
+	@PostMapping(path = "/linkclick")
 	public void linkClick(@RequestParam(name = "id") long id, HttpServletRequest request) {
 		log.info("Link with id {} clicked", id);
 		
 		String remoteAddr = "";
-
         if (request != null) {
             remoteAddr = request.getHeader("X-FORWARDED-FOR");
             if (remoteAddr == null || "".equals(remoteAddr)) {
@@ -118,7 +113,7 @@ public class FeedController {
         }
 	}
 	
-	@GetMapping(path = "/rest/unreadcount")
+	@GetMapping(path = "/unreadcount")
 	public long getUnreadCount(@RequestParam(name = "category", required = false) Category category, @RequestParam(name = "datetime") String dateTime) {
 		Date date = new Date(Long.parseLong(dateTime));
 		
@@ -141,12 +136,12 @@ public class FeedController {
 		return dateAsString;
 	}
 
-	@GetMapping(path = "/rest/test")
+	@GetMapping(path = "/test")
 	public String test() {
 		return "Server time " + LocalDateTime.now().toString();
 	}
 	
-	@GetMapping(path = "/rest/addfeed")
+	@GetMapping(path = "/addfeed")
 	public void addFeed(@RequestParam(name = "category", required = false) Category category) {
 		Feed entity = new Feed();
 		entity.setRssSource(RssSource.ILTALEHTI);

@@ -119,7 +119,7 @@ class Content extends React.Component {
   }
 
   tick() {
-      //console.log("Last fetch time: " + this.lastFetchTime)
+      console.log("Last fetch time: " + this.lastFetchTime)
       var category = this.props.category;
       var content = this;
       var url;
