@@ -9,7 +9,7 @@
 
 1. Open Terminal in frontend project, execute: `npm install` 
    to install frontend dependencies
-2  Start backend services with `bootRun` gradle task 
+2. Start backend services with `bootRun` gradle task 
 3. Start frontend, run `npm run start` in frontend Terminal
 4. Open your browser on http://localhost:3000
 
@@ -28,3 +28,8 @@
 2. Configure pPipeline section. Select `Pipeline script from SCM`
 3. Configure Git repository location
 4. Configure script path: `Jenkisfile`
+
+## Testing
+
+Use Postman to test REST services. File `WooDy.postman_collection.json` 
+contains requests for testing purposes.

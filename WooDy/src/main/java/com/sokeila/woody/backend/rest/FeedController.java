@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.google.common.hash.Hashing;
@@ -44,7 +45,7 @@ public class FeedController {
     private IPHashRepository ipHashRepository;
 	
 	@GetMapping(path = "/news")
-	public Page<Feed> news(@RequestParam(name = "page", required = false) Integer page, @RequestParam(name = "category", required = false) Category category, HttpServletRequest request) {
+	public ResponseEntity<Page<Feed>> news(@RequestParam(name = "page", required = false) Integer page, @RequestParam(name = "category", required = false) Category category, HttpServletRequest request) {
 		if(page == null) {
 			page = 0;
 		}
@@ -61,27 +62,27 @@ public class FeedController {
 		}
 		
 		result.get().forEach(feed -> {
-			feed.resolveClickCount();
-			feed.setIPClicks(null);
+			feed.resolveClickCount();  // Get click count from IP clicks
+			feed.setIPClicks(null); // Don't expose IP clicks to rest client
 		});
 		
-		return result;
+		return ResponseEntity.ok().body(result);
 	}
 	
 	@GetMapping(path = "/getfeed")
-	public Feed getFeed(@RequestParam(name = "id") long id) {
+	public ResponseEntity<Feed> getFeed(@RequestParam(name = "id") long id) {
 		log.info("Find feed with id {}", id);
 
 		Optional<Feed> feedOpt = feedRepository.findById(id);
 		if(feedOpt.isPresent()) {
 			Feed result = feedOpt.get();
-			result.resolveClickCount();
-			result.setIPClicks(null);
-			
-			return result;
+			result.resolveClickCount(); // Get click count from IP clicks
+			result.setIPClicks(null); // Don't expose IP clicks to rest client
+
+			return ResponseEntity.ok().body(result);
 		}
-		
-		return null;
+
+		return ResponseEntity.notFound().build();
 	}
 	
 	@PostMapping(path = "/linkclick")
@@ -112,9 +113,9 @@ public class FeedController {
         	}
         }
 	}
-	
+
 	@GetMapping(path = "/unreadcount")
-	public long getUnreadCount(@RequestParam(name = "category", required = false) Category category, @RequestParam(name = "datetime") String dateTime) {
+	public ResponseEntity<Long> getUnreadCount(@RequestParam(name = "category", required = false) Category category, @RequestParam(name = "datetime") String dateTime) {
 		Date date = new Date(Long.parseLong(dateTime));
 		
 		long unreadCount;
@@ -126,7 +127,7 @@ public class FeedController {
 		
 		log.debug("UnreadCount after date " + dateToString(date) + " in category " + category + " is " + unreadCount);
 
-		return unreadCount;
+		return ResponseEntity.ok().body(unreadCount);
 	}
 	
 	private String dateToString(Date date) {
