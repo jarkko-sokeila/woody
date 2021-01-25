@@ -14,11 +14,6 @@ class Navigation extends React.Component {
 	}
 	
 	componentDidMount(){
-		//var ReactDOM = require('react-dom');
-		//var elem = ReactDOM.findDOMNode(this.refs.nav);
-		//elem.classList.toggle('visible');
-		//console.log("elem style: " + elem.currentStyle); 
-		//console.log("navigation style display: " + elem.style.getPropertyValue('margin')); 
 	}
 	
 	toggle() {
