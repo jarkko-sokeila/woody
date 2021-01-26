@@ -1,8 +1,10 @@
 # WooDy news collector
 
-## Screenshot
+## Screenshots
 
 ![Preview2](https://user-images.githubusercontent.com/8104602/105889422-cf654680-6016-11eb-9b92-9c5d3d8d8cb0.png)
+![Preview2](https://user-images.githubusercontent.com/8104602/105890865-9037f500-6018-11eb-975f-8863639193f5.png)
+![Preview2](https://user-images.githubusercontent.com/8104602/105890867-90d08b80-6018-11eb-9d41-d886168ba9d7.png)
 
 ## Prerequisites
 
@@ -42,6 +44,10 @@ contains requests for testing purposes.
 ## Jenkins
 
 Jenins build implemented with Jenkinsfile
+
+- JavaDoc
+- Junit report
+- Jacoco code coverage report
 
 ![Preview2](https://user-images.githubusercontent.com/8104602/105889578-ff144e80-6016-11eb-9c86-85dc8c216818.png)
 ![Preview2](https://user-images.githubusercontent.com/8104602/105889579-ff144e80-6016-11eb-961b-7461e9a28767.png)
