@@ -1,4 +1,8 @@
-# React Project
+# WooDy news collector
+
+## Screenshot
+
+![Preview2](https://user-images.githubusercontent.com/8104602/105889422-cf654680-6016-11eb-9b92-9c5d3d8d8cb0.png)
 
 ## Prerequisites
 
@@ -26,7 +30,7 @@
 ***!Note, Jenkinsfile supports currently only linux***
 
 1. Create new pipeline Item
-2. Configure pPipeline section. Select `Pipeline script from SCM`
+2. Configure Pipeline section. Select `Pipeline script from SCM`
 3. Configure Git repository location
 4. Configure script path: `Jenkisfile`
 
@@ -34,3 +38,10 @@
 
 Use Postman to test REST services. File `WooDy.postman_collection.json` 
 contains requests for testing purposes.
+
+## Jenkins
+
+Jenins build implemented with Jenkinsfile
+
+![Preview2](https://user-images.githubusercontent.com/8104602/105889578-ff144e80-6016-11eb-9c86-85dc8c216818.png)
+![Preview2](https://user-images.githubusercontent.com/8104602/105889579-ff144e80-6016-11eb-961b-7461e9a28767.png)
