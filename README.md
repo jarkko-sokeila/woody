@@ -28,6 +28,11 @@
 3. Start application `java -jar WooDy.jar`
 4. Open your browser on http://localhost:8080
 
+## Testing
+
+Use Postman to test REST services. File `WooDy.postman_collection.json` 
+contains requests for testing purposes.
+
 ## Jenkins build setup
 ***!Note, Jenkinsfile supports currently only linux***
 
@@ -36,14 +41,7 @@
 3. Configure Git repository location
 4. Configure script path: `Jenkisfile`
 
-## Testing
-
-Use Postman to test REST services. File `WooDy.postman_collection.json` 
-contains requests for testing purposes.
-
-## Jenkins
-
-Jenins build implemented with Jenkinsfile
+Features
 
 - JavaDoc
 - Junit report
