@@ -4,6 +4,7 @@
 
 - NodeJS ^8.9
 - npm ^5.6
+- Java 1.8
 
 ## Steps to Run application in development
 
