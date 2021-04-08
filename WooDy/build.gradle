@@ -31,6 +31,7 @@ dependencies {
 }
 
 bootJar {
+    dependsOn ':frontend:buildFrontend'
     from('../frontend/build') {
         into 'static'
     }
