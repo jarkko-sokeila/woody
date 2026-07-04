@@ -5,13 +5,14 @@ import java.util.Date;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import com.sokeila.woody.backend.entity.Category;
 import com.sokeila.woody.backend.entity.Feed;
 import com.sokeila.woody.backend.entity.RssSource;
 
-public interface FeedRepository extends PagingAndSortingRepository<Feed, Long> {
+public interface FeedRepository extends PagingAndSortingRepository<Feed, Long>, CrudRepository<Feed, Long> {
 	public Feed findByGuid(String guid);
 	public boolean existsByGuid(String guid);
 	public Collection<Feed> findByTitle(String title);

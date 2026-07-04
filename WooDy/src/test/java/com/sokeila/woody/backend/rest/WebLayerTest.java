@@ -11,14 +11,14 @@ import com.sokeila.woody.backend.services.FeedRepository;
 import com.sokeila.woody.backend.services.IPHashRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 import java.util.Date;
 import java.util.Optional;
 
@@ -28,16 +28,16 @@ public class WebLayerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private EntityManager entityManager;
 
-    @MockBean
+    @MockitoBean
     private EntityManagerFactory entityManagerFactory;
 
-    @MockBean
+    @MockitoBean
     private FeedRepository feedRepository;
 
-    @MockBean
+    @MockitoBean
     private IPHashRepository ipHashRepository;
 
     @Test
