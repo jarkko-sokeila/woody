@@ -8,17 +8,23 @@
 
 ## Prerequisites
 
-- NodeJS ^8.9
-- npm ^5.6
+- NodeJS 16.20.2 (pinned in `frontend/.nvmrc`)
+- npm 8 (bundled with Node 16)
 - Java 1.8
+
+> **Note:** The frontend uses `react-scripts` 2.x, which is incompatible with
+> modern Node versions (Node 17+ fails with `Error: No such module: http_parser`).
+> Use Node 16.20.2. If you have [nvm](https://github.com/nvm-sh/nvm) /
+> [nvm-windows](https://github.com/coreybutler/nvm-windows) installed, run
+> `nvm use` (or `nvm use 16.20.2`) in the `frontend` folder before starting.
 
 ## Steps to Run application in development
 
-1. Open Terminal in frontend project, execute: `npm install` 
-   to install frontend dependencies
-2. Start backend services with `bootRun` gradle task 
-3. Start frontend, run `npm run start` in frontend Terminal
-4. Open your browser on http://localhost:3000
+1. In the `frontend` folder, select the correct Node version: `nvm use 16.20.2`
+2. Install frontend dependencies: `npm install`
+3. Start backend services with the `bootRun` gradle task
+4. Start the frontend: `npm run start` (run `nvm use 16.20.2` first in any new terminal)
+5. Open your browser on http://localhost:3000
 
 ## Steps to Run application in production
 
