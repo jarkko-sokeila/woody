@@ -6,5 +6,5 @@ import com.sokeila.woody.backend.entity.IPHash;
 
 public interface IPHashRepository extends CrudRepository<IPHash, Long> {
 
-	public IPHash findByIpHash(String ipHash);
+	IPHash findByIpHash(String ipHash);
 }

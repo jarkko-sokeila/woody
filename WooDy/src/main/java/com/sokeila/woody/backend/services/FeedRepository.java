@@ -1,26 +1,25 @@
 package com.sokeila.woody.backend.services;
 
-import java.util.Collection;
-import java.util.Date;
-
+import com.sokeila.woody.backend.entity.Category;
+import com.sokeila.woody.backend.entity.Feed;
+import com.sokeila.woody.backend.entity.RssSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-import com.sokeila.woody.backend.entity.Category;
-import com.sokeila.woody.backend.entity.Feed;
-import com.sokeila.woody.backend.entity.RssSource;
+import java.util.Collection;
+import java.util.Date;
 
 public interface FeedRepository extends PagingAndSortingRepository<Feed, Long>, CrudRepository<Feed, Long> {
-	public Feed findByGuid(String guid);
-	public boolean existsByGuid(String guid);
-	public Collection<Feed> findByTitle(String title);
-	public boolean existsByRssSourceAndTitle(RssSource rssSource, String title);
-	public Collection<Feed> findByOrderByPublishedDesc();
+	Feed findByGuid(String guid);
+	boolean existsByGuid(String guid);
+	Collection<Feed> findByTitle(String title);
+	boolean existsByRssSourceAndTitle(RssSource rssSource, String title);
+	Collection<Feed> findByOrderByPublishedDesc();
 	
-	public Page<Feed> findByOrderByPublishedDesc(Pageable pageable);
-	public Page<Feed> findByCategoryOrderByPublishedDesc(Category category,Pageable pageable);
+	Page<Feed> findByOrderByPublishedDesc(Pageable pageable);
+	Page<Feed> findByCategoryOrderByPublishedDesc(Category category, Pageable pageable);
 	
 	long countByCreatedGreaterThan(Date date);
 	long countByCategoryAndCreatedGreaterThan(Category category, Date date);

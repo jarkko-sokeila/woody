@@ -19,7 +19,8 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
-import jakarta.persistence.Transient;
+
+import org.hibernate.annotations.Formula;
 
 @Entity
 @Table(name = "T_FEED")
@@ -65,7 +66,7 @@ public class Feed {
 	@JoinTable(name = "J_FEED_IP_HASH", joinColumns = @JoinColumn(name = "C_FEED_ID"), inverseJoinColumns = @JoinColumn(name = "C_IP_HASH_ID"))
 	private Set<IPHash> IPClicks;
 	
-	@Transient
+	@Formula("(select count(*) from J_FEED_IP_HASH j where j.C_FEED_ID = C_ID)")
 	private int clickCount;
 	
 	public long getId() {
@@ -170,12 +171,6 @@ public class Feed {
 		}
 		
 		IPClicks.add(ipHash);
-	}
-	
-	public void resolveClickCount() {
-		if(IPClicks != null) {
-			this.clickCount = IPClicks.size();
-		}
 	}
 	
 	@Override

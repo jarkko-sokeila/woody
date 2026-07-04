@@ -40,7 +40,7 @@ public class FeedController {
 			page = 0;
 		}
 		
-		log.info("f ip: {}, r ip: {}", request.getHeader("X-FORWARDED-FOR"), request.getRemoteAddr());
+		log.debug("f ip: {}, r ip: {}", request.getHeader("X-FORWARDED-FOR"), request.getRemoteAddr());
 		log.info("Load news in page {} and category {}", page, category);
 		
 		Pageable pageable = PageRequest.of(page, 200);
@@ -52,7 +52,6 @@ public class FeedController {
 		}
 		
 		result.get().forEach(feed -> {
-			feed.resolveClickCount();  // Get click count from IP clicks
 			feed.setIPClicks(null); // Don't expose IP clicks to rest client
 		});
 		
@@ -66,7 +65,6 @@ public class FeedController {
 		Optional<Feed> feedOpt = feedRepository.findById(id);
 		if(feedOpt.isPresent()) {
 			Feed result = feedOpt.get();
-			result.resolveClickCount(); // Get click count from IP clicks
 			result.setIPClicks(null); // Don't expose IP clicks to rest client
 
 			return ResponseEntity.ok().body(result);
@@ -89,7 +87,7 @@ public class FeedController {
         
         if(remoteAddr != null && !remoteAddr.isEmpty()) {
         	String hashed = Hashing.sha256().hashString(remoteAddr, StandardCharsets.UTF_8).toString();
-        	log.info("IP is {}, hashed {}, length {}", remoteAddr, hashed, hashed.length());
+        	log.debug("IP is {}, hashed {}, length {}", remoteAddr, hashed, hashed.length());
         	Optional<Feed> feedOptional = feedRepository.findById(id);
         	if(feedOptional.isPresent()) {
         		Feed feed = feedOptional.get();
