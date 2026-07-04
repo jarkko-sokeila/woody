@@ -1,24 +1,7 @@
 package com.sokeila.woody.backend;
 
-import java.net.URL;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import javax.net.ssl.SSLContext;
-
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-
 import com.rometools.rome.feed.synd.SyndCategory;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
@@ -29,6 +12,24 @@ import com.sokeila.woody.backend.entity.Feed;
 import com.sokeila.woody.backend.entity.RssSource;
 import com.sokeila.woody.backend.entity.SubCategory;
 import com.sokeila.woody.backend.services.FeedRepository;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.net.ssl.SSLContext;
+import java.net.URL;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 public class ScheduledTasks {
@@ -38,8 +39,8 @@ public class ScheduledTasks {
     @Autowired
     private FeedRepository feedRepository;
 
-    private static Cache<String, Boolean> cache = CacheBuilder.newBuilder()
-			.expireAfterWrite(6, TimeUnit.HOURS)
+    private static final Cache<String, Boolean> cache = CacheBuilder.newBuilder()
+			.expireAfterWrite(Duration.ofHours(6))
 			.build();
     
     @Scheduled(fixedDelay = 5, timeUnit = TimeUnit.MINUTES)
@@ -51,6 +52,16 @@ public class ScheduledTasks {
 		}
     }
 
+	@Scheduled(fixedDelay = 1, timeUnit = TimeUnit.HOURS)
+	@Transactional
+	public void deleteOldFeeds() {
+		Date cutoff = Date.from(Instant.now().minus(Duration.ofDays(1)));
+		long deleted = feedRepository.deleteByPublishedBefore(cutoff);
+		if(deleted > 0) {
+			log.info("Deleted {} feeds older than 1 day (published before {})", deleted, cutoff);
+		}
+	}
+
 	private void parseRss(RssSource rssSource, Category defaultCategory, Function<RssSource, String> urlFunction) {
 		String url = urlFunction.apply(rssSource);
 		
@@ -58,7 +69,7 @@ public class ScheduledTasks {
 			SSLContext context = SSLContext.getInstance("TLSv1.2");
 			context.init(null,null,null);
 			SSLContext.setDefault(context);
-			if(url != null && url.length() > 0) {
+			if(url != null && !url.isEmpty()) {
 	            try (XmlReader reader = new XmlReader(new URL(url))) {
 	                SyndFeed feed = new SyndFeedInput().build(reader);
 	                
@@ -105,8 +116,8 @@ public class ScheduledTasks {
 			published = now;
 		}
 		entity.setPublished(published);
-		entity.setCategory(categoryData != null ? categoryData.getCategory(): defaultCategory);
-		entity.setSubCategory(categoryData != null ? categoryData.getSubCategory() : null);
+		entity.setCategory(categoryData != null ? categoryData.category(): defaultCategory);
+		entity.setSubCategory(categoryData != null ? categoryData.subCategory() : null);
 		entity.setCreated(now);
 		
 		feedRepository.save(entity);
@@ -129,7 +140,7 @@ public class ScheduledTasks {
 		if(description.length() > 4096) {
 			log.debug("description length {}", description.length());
 			description = description.substring(0, 4092) + "...";
-			log.debug("description length {}", description.length());
+			log.debug("description length after substring {}", description.length());
 			log.debug("description {}", description);
 		}
 		
@@ -140,7 +151,7 @@ public class ScheduledTasks {
 		CategoryData categoryData = null;
 		List<SyndCategory> syndCategories = entry.getCategories();
 		if(syndCategories.size() == 1) {
-			categoryData = resolveCategoryData(syndCategories.get(0));
+			categoryData = resolveCategoryData(syndCategories.getFirst());
 		} else {
 			Set<CategoryData> categorySet = new HashSet<>();
 			syndCategories = filterGeneralCategories(syndCategories);
@@ -156,7 +167,7 @@ public class ScheduledTasks {
 			}
 		}
 		
-		if(categoryData == null && syndCategories.size() > 0) {
+		if(categoryData == null && !syndCategories.isEmpty()) {
 			Collection<String> categories = syndCategories.stream().map(SyndCategory::getName).filter(Objects::nonNull).collect(Collectors.toList());
 			log.info("Could not resolve category for title {}. \nCategories in feed are: {}", entry.getTitle(), categories);
 		}
@@ -269,14 +280,14 @@ public class ScheduledTasks {
 
 	private boolean categoryBelongs(String categoryName, Compare compareContains, Compare compareEquals) {
 		if(compareContains != null) {
-			for(String category: compareContains.getCategoryNames()) {
+			for(String category: compareContains.categoryNames()) {
 				if(categoryName.contains(category))
 					return true;
 			}
 		}
 		
 		if(compareEquals != null) {
-			for(String category: compareEquals.getCategoryNames()) {
+			for(String category: compareEquals.categoryNames()) {
 				if(categoryName.equalsIgnoreCase(category))
 					return true;
 			}
@@ -287,48 +298,28 @@ public class ScheduledTasks {
 	private boolean feedExists(SyndEntry entry) {
 		return feedRepository.existsByGuid(entry.getUri());
 	}
-	
-	private static class CategoryData {
-		private final Category category;
-		private final SubCategory subCategory;
-		
-		public CategoryData(Category category, SubCategory subCategory) {
-			this.category = category;
-			this.subCategory = subCategory;
-		}
-		
-		public Category getCategory() {
-			return category;
-		}
-		public SubCategory getSubCategory() {
-			return subCategory;
-		}
+
+	private record CategoryData(Category category, SubCategory subCategory) {
 
 		@Override
-		public boolean equals(Object o) {
-			if (this == o) return true;
+			public boolean equals(Object o) {
+				if (this == o) return true;
 
-			if (!(o instanceof CategoryData)) return false;
+				if (!(o instanceof CategoryData(Category category1, SubCategory subCategory1))) return false;
 
-			CategoryData that = (CategoryData) o;
+			return new EqualsBuilder().append(category(), category1).append(subCategory(), subCategory1).isEquals();
+			}
 
-			return new EqualsBuilder().append(getCategory(), that.getCategory()).append(getSubCategory(), that.getSubCategory()).isEquals();
+			@Override
+			public int hashCode() {
+				return new HashCodeBuilder(17, 37).append(category()).append(subCategory()).toHashCode();
+			}
 		}
 
-		@Override
-		public int hashCode() {
-			return new HashCodeBuilder(17, 37).append(getCategory()).append(getSubCategory()).toHashCode();
-		}
-	}
-	
-	private static class Compare {
-		private final Collection<String> categoryNames;
-		
-		public Compare(String... values) {
-			categoryNames = Arrays.asList(values);
-		}
-		public Collection<String> getCategoryNames() {
-			return categoryNames;
-		}
+	private record Compare(Collection<String> categoryNames) {
+			private Compare(String... categoryNames) {
+                this(Arrays.asList(categoryNames));
+            }
+
 	}
 }

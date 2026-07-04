@@ -23,4 +23,6 @@ public interface FeedRepository extends PagingAndSortingRepository<Feed, Long>, 
 	
 	long countByCreatedGreaterThan(Date date);
 	long countByCategoryAndCreatedGreaterThan(Category category, Date date);
+
+	long deleteByPublishedBefore(Date date);
 }
