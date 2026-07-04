@@ -10,7 +10,7 @@
 
 - NodeJS 16.20.2 (pinned in `frontend/.nvmrc`)
 - npm 8 (bundled with Node 16)
-- Java 1.8
+- Java 17 or newer (Spring Boot 4.x baseline; built and tested with JDK 25)
 
 > **Note:** The frontend uses `react-scripts` 2.x, which is incompatible with
 > modern Node versions (Node 17+ fails with `Error: No such module: http_parser`).
