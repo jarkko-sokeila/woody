@@ -18,7 +18,6 @@ class Navigation extends React.Component {
 	
 	toggle() {
 		var elem = this.nav.current;
-		console.log("elem: " + elem); 
 		elem.classList.toggle('visible')
 	}
 	

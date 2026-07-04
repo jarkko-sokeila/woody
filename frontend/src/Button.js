@@ -8,8 +8,6 @@ class Button extends React.Component {
 		  classes += " selected"
 	  }
 	  
-	  console.log("selectedCategory: " + this.props.selectedCategory + ",text: " + this.props.text + " ,classes:" + classes)
-	  
     return (
         <a href={this.props.link} >
             <div className={classes} onClick={this.handleClick}>
@@ -20,7 +18,6 @@ class Button extends React.Component {
   }
 
   handleClick = (event) => {
-    console.log('I was clicked')
     this.props.onCategoryChanged(this.props.text)
   }
 }

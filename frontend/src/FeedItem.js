@@ -19,7 +19,6 @@ class FeedItem extends React.Component {
 	
   getDate(date) {
 	  var d = new Date(date);
-	  /*console.log(d);*/
 	  var hours = d.getHours()
 	  if(hours < 10) {
 		  hours = "0" + hours;
@@ -28,18 +27,19 @@ class FeedItem extends React.Component {
 	  if(minutes < 10) {
 		  minutes = "0" + minutes;
 	  }
-	  
+
 	  var currentDate = new Date()
-	  if(d.getDate() < currentDate.getDate()) {
+	  var isSameDay = d.getFullYear() === currentDate.getFullYear() &&
+		  d.getMonth() === currentDate.getMonth() &&
+		  d.getDate() === currentDate.getDate()
+	  if(!isSameDay) {
 		  return d.getDate() + "." + (d.getMonth() + 1) + " " + hours + ":" + minutes
 	  }
-	  
+
 	  return hours + ":" + minutes
   }
 
   getSource(source, subCategory) {
-    /*console.log("source: " + source + ", subCategory: " + subCategory)*/
-    
     if(source === 'ILTALEHTI') {
         source = "Iltalehti"
     } else if (source === 'MUROPAKETTI') {
@@ -183,7 +183,6 @@ class FeedItem extends React.Component {
   }
   
   clickLink() {
-	  console.log("Link with id " + this.state.item.id + " clicked")
 	  var content = this;
 	  fetch('/rest/linkclick', {
 		   method: 'post',
@@ -191,23 +190,19 @@ class FeedItem extends React.Component {
 		   body: "id="+this.state.item.id
 		  })
 		  .then(function(response) {
-	          //console.log(response);
 			  content.refresh()
 	      });
   }
   
   refresh() {
-	  console.log("Refresh item id " + this.state.item.id)
       var content = this;
       var url = "/rest/getfeed?id=" + this.state.item.id;
 
 	  fetch(url)
       .then(function(response) {
-          console.log(response);
           return response.json();
       })
       .then(function(feed) {
-          console.log(feed);
           content.setState({ item: feed });
       });
   }

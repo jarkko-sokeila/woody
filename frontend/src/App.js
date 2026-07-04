@@ -28,18 +28,14 @@ class App extends React.Component {
 	}
 	
 	toggleMenu() {
-		//this.setState({menuVisible: !this.menuVisible})
-		console.log("App toggle menu ")
 		this.nav.current.toggle();
-		
+
 		var elem = this.overlay.current;
-		console.log("elem: " + elem); 
 		elem.classList.toggle('display')
 	}
 	
 	setIsMenuOpen(isOpen) {
 		this.setState({menuVisible: isOpen})
-		console.log("Set menu open " + isOpen)
 	}
 	
 	Home() {

@@ -15,7 +15,6 @@ class Content extends React.Component {
     constructor(props) {
         super(props);
         this.cookies = new Cookies();
-        console.log("cookie: " + this.cookies.get('showDescription'))
 
         this.state = {
             data: null,
@@ -28,7 +27,6 @@ class Content extends React.Component {
         this.timeIndex = 0
         this.timeGroups = [0, 5, 10, 30, 60, 120, 240]
         this.timeGroupsBool = [true, true, true, true, true, true, true]
-        console.log("this.state showDescription " + this.state.showDescription)
         this.getFeeds = this.getFeeds.bind(this);
         this.showHeader = this.showHeader.bind(this);
         this.toggleMenu = this.toggleMenu.bind(this);
@@ -44,7 +42,6 @@ class Content extends React.Component {
 	this.timeGroupsBool = [true, true, true, true, true, true, true]
 	this.setState({showDescription: event.target.checked})
     this.cookies.set('showDescription', event.target.checked)
-    console.log("event: " + event.target.checked + " ,state showDescription: " + this.state.showDescription + " ,cookie showDescription: " + this.cookies.get('showDescription'))
   };
 
   getData() {
@@ -64,14 +61,11 @@ class Content extends React.Component {
     }
     this.setState({unreadCount: 0})
     this.timeGroupsBool = [true, true, true, true, true, true, true]
-    console.log("Read news from url " + url)
     fetch(url)
         .then(function(response) {
-            console.log(response);
             return response.json();
         })
         .then(function(feeds) {
-            console.log(feeds.content);
             content.timeGroupsBool = [true, true, true, true, true, true, true]
             content.setState({ feeds: feeds.content });
         });
@@ -107,7 +101,6 @@ class Content extends React.Component {
   }
 
   componentDidMount(){
-    console.log('I was triggered during componentDidMount')
     this.getData();
     this.getFeeds();
     this.onTopInit();
@@ -119,7 +112,6 @@ class Content extends React.Component {
   }
 
   tick() {
-      console.log("Last fetch time: " + this.lastFetchTime)
       var category = this.props.category;
       var content = this;
       var url;
@@ -130,11 +122,9 @@ class Content extends React.Component {
       }
 	  fetch(url)
       .then(function(response) {
-          //console.log(response);
           return response.text();
       })
       .then(function(count) {
-          //console.log("Unread count is " + count + " state unread count " + content.state.unreadCount);
           if(content.state.unreadCount !== parseInt(count)) {
             content.timeGroupsBool = [true, true, true, true, true, true, true]
             content.setState({unreadCount: parseInt(count)})
@@ -161,23 +151,19 @@ class Content extends React.Component {
   }
   
   toggleMenu() {
-	  console.log('Toggle menu')
 	  this.props.onToggle();
   }
 
   topFunction() {
-	  console.log('Back to top')
 	  document.body.scrollTop = 0;
 	  document.documentElement.scrollTop = 0;
   }
 
   showHeader(item) {
-      //console.log("test loop value " + this.test)
 	  var currentDate = new Date()
 	  var published = new Date(item.published)
 	  var difference = (currentDate.getTime() - published.getTime())
-	  //console.log("current date: " + currentDate.toLocaleString() + " ,published: " + published.toLocaleString() + " ,difference: " + difference)
-	  
+
       if(this.timeGroupsBool[0] === true && difference < this.minToMs(5)) {
     	  this.timeGroupsBool[0] = false
     	  return 0
@@ -221,7 +207,6 @@ class Content extends React.Component {
   }
   
   checkTimeDifference(time, difference) {
-	  console.log("is difference " + difference + " higher than " + (time * 60 * 1000) + " , time " + time)
 	  if(difference > (time * 60 * 1000)) {
 		  return true
 	  }
@@ -230,9 +215,7 @@ class Content extends React.Component {
   }
 
   renderFeedItems(item, i) {
-    //console.log("Test")
     var showHeader = this.showHeader(item)
-    //console.log("Show header " + showHeader)
     return <FeedItem key={item.id} item={item} showDescription={this.state.showDescription} showHeader={showHeader} />
   }
   
@@ -273,7 +256,7 @@ class Content extends React.Component {
                 }
             </div>
             <footer className="footer">
-            	<div className="center"><p>Copyright 2019 WooDy</p></div>
+            	<div className="center"><p>Copyright {new Date().getFullYear()} WooDy</p></div>
             </footer>
             
             <FontAwesomeIcon icon={faArrowCircleUp} onClick={this.topFunction} id="topBtn" />
