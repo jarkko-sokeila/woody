@@ -42,7 +42,7 @@ public class ScheduledTasks {
 			.expireAfterWrite(6, TimeUnit.HOURS)
 			.build();
     
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedDelay = 5, timeUnit = TimeUnit.MINUTES)
     public void readRSSFeeds() {
 		for(RssSource rssSource: RssSource.values()) {
 			parseRss(rssSource, Category.NEWS, RssSource::getNewsSource);
@@ -100,7 +100,11 @@ public class ScheduledTasks {
 		entity.setDescription(formatDescription(entry.getDescription() != null ? entry.getDescription().getValue(): null));
 		entity.setGuid(entry.getUri());
 		entity.setLink(entry.getLink());
-		entity.setPublished(entry.getPublishedDate().after(now) ? now: entry.getPublishedDate());
+		Date published = entry.getPublishedDate();
+		if(published == null || published.after(now)) {
+			published = now;
+		}
+		entity.setPublished(published);
 		entity.setCategory(categoryData != null ? categoryData.getCategory(): defaultCategory);
 		entity.setSubCategory(categoryData != null ? categoryData.getSubCategory() : null);
 		entity.setCreated(now);
